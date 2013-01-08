@@ -8,8 +8,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-cdef extern from "Thor/Time.hpp" namespace "sf":
-	
+cdef extern from "Thor/Time.hpp" namespace "thor":
+
 	cdef cppclass Timer:
 		Timer()
 		Time getRemainingTime()
