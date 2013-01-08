@@ -51,6 +51,13 @@ if USE_CYTHON:
 			print("Please install the correct version of cython and run again.")
 			sys.exit(1)
 
+# define the include directory
+if platform.system() == 'Windows':
+	sfml_include = sys.prefix + "\\include\\pysfml\\"
+else:
+	major, minor, _, _ , _ = sys.version_info
+	sfml_include = sys.prefix + "/include/python{0}.{1}/sfml/".format(major, minor)
+	
 if USE_CYTHON:
 	file_extension = "pyx"
 else:
@@ -67,7 +74,7 @@ else:
 extension = lambda name: Extension(
 	'thor.' + name,
 	sources=["src/thor/" + name + file_extension],
-	include_dirs=['include'], 
+	include_dirs=['include', sfml_include], 
 	language='c++',
 	libraries=libraries)
 
