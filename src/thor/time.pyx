@@ -43,3 +43,29 @@ cdef class Timer:
 
 	def restart(self, Time time_limit):
 		self.p_this.restart(time_limit.p_this[0])
+
+
+cdef class StopWatch:
+	cdef dtime.StopWatch *p_this
+
+	def __cinit__(self, *args, **kwargs):
+		self.p_this = new dtime.StopWatch()
+		
+	def __dealloc__(self):
+		del self.p_this
+		
+	def start(self):
+		self.p_this.start()
+
+	def stop(self):
+		self.p_this.stop()
+		
+	property running:
+		def __get__(self):
+			return self.p_this.isRunning()
+		
+	def reset(self):
+		self.p_this.reset()
+
+	def restart(self):
+		self.p_this.restart()
