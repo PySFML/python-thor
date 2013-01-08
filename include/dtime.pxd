@@ -22,7 +22,7 @@ cdef extern from "Thor/Time.hpp" namespace "thor":
 
 	cdef cppclass StopWatch:
 		StopWatch()
-		Time getRemainingTime()
+		Time getElapsedTime()
 		bint isRunning()
 		void start()
 		void stop()
