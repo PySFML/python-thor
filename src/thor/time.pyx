@@ -79,3 +79,9 @@ cdef class StopWatch:
 
 	def restart(self):
 		self.p_this.restart()
+		
+	property elapsed_time:
+		def __get__(self):
+			cdef dsystem.Time* p = new dsystem.Time()
+			p[0] = self.p_this.getElapsedTime()
+			return wrap_time(p)
