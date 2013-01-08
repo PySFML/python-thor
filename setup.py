@@ -76,6 +76,7 @@ extension = lambda name: Extension(
 	sources=["src/thor/" + name + file_extension],
 	include_dirs=['include', sfml_include], 
 	language='c++',
+	extra_compile_args = ['--std=c++0x'],
 	libraries=libraries)
 
 extensions = [extension(module) for module in modules]
