@@ -15,6 +15,11 @@ cdef extern from "system.h":
 	cdef class sfml.system.Time [object PyTimeObject]:
 		cdef dsystem.Time *p_this
 		
+cdef api object wrap_time(dsystem.Time* p):
+	cdef Time r = Time.__new__(Time)
+	r.p_this = p
+	return r
+	
 cdef class Timer:
 	cdef dtime.Timer *p_this
 
@@ -44,6 +49,11 @@ cdef class Timer:
 	def restart(self, Time time_limit):
 		self.p_this.restart(time_limit.p_this[0])
 
+	property remaining_time:
+		def __get__(self):
+			cdef dsystem.Time* p = new dsystem.Time()
+			p[0] = self.p_this.getRemainingTime()
+			return wrap_time(p)
 
 cdef class StopWatch:
 	cdef dtime.StopWatch *p_this
