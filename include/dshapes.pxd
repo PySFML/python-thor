@@ -10,7 +10,7 @@
 
 
 from pysfml.dsystem cimport Vector2f
-from pysfml.dgraphics cimport Color
+from pysfml.dgraphics cimport Color, Shape
 
 cdef extern from "Thor/Shapes.hpp" namespace "thor":
 
@@ -27,3 +27,20 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
 		float getThickness()
 		void setColor(Color&)
 		Color getColor()
+	
+	cdef cppclass ConcaveShape:
+		ConcaveShape()
+		ConcaveShape(Shape&)
+		void swap(ConcaveShape&)
+		void setPointCount(unsigned int)
+		unsigned int getPointCount()
+		void setPoint(unsigned int, Vector2f)
+		Vector2f getPoint(unsigned int)
+		void setFillColor(Color&)
+		void setOutlineColor(Color&)
+		Color getFillColor()
+		Color getOutlineColor()
+		setOutlineThickness(float)
+		float getOutlineThickness()
+
+	void swap(ConcaveShape&, ConcaveShape&)
