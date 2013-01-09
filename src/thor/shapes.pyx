@@ -62,3 +62,53 @@ cdef class Arrow(TransformableDrawable):
 		def __set__(self, Color color):
 			self.p_this.setColor(color.p_this[0])
 
+
+cdef class ConcaveShape(TransformableDrawable):
+	cdef dshapes.ConcaveShape *p_this
+
+	# TODO: improve constructor
+	def __cinit__(self, position, direction, Color color, float thickness):
+		self.p_this = new dshapes.ConcaveShape()
+		self.p_drawable = <dgraphics.Drawable*>self.p_this
+		self.p_transformable = <dgraphics.Transformable*>self.p_this
+
+	def __dealloc__(self):
+		del self.p_this
+
+	property fill_color:
+		def __get__(self):
+			cdef dgraphics.Color* p = new dgraphics.Color()
+			p[0] = self.p_this.getFillColor()
+			return wrap_color(p)
+			
+		def __set__(self, Color color):
+			self.p_this.setFillColor(color.p_this[0])
+
+	property outline_color:
+		def __get__(self):
+			cdef dgraphics.Color* p = new dgraphics.Color()
+			p[0] = self.p_this.getOutlineColor()
+			return wrap_color(p)
+			
+		def __set__(self, Color color):
+			self.p_this.setOutlineColor(color.p_this[0])
+		
+	property outline_thickness:
+		def __get__(self):
+			return self.p_this.getOutlineThickness()
+			
+		def __set__(self, float thickness):
+			self.p_this.setOutlineThickness(thickness)
+
+	property point_count:
+		def __get__(self):
+			return self.p_this.getPointCount()
+			
+		def __set__(self, unsigned int count):
+			self.p_this.setPointCount(count)
+			
+	def get_point(self, unsigned int index):
+		return Vector2(self.p_this.getPoint(index).x, self.p_this.getPoint(index).y)
+			
+	def set_point(self, unsigned int index, point):
+		self.p_this.setPoint(index, vector2_to_vector2f(point))
