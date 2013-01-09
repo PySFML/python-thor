@@ -8,18 +8,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-cimport dsystem
+from pysfml cimport dsystem
 cimport dtime
 
-cdef extern from "system.h":
-	cdef class sfml.system.Time [object PyTimeObject]:
-		cdef dsystem.Time *p_this
-		
-cdef api object wrap_time(dsystem.Time* p):
-	cdef Time r = Time.__new__(Time)
-	r.p_this = p
-	return r
-	
+from pysfml.system cimport Time, wrap_time
+
+
+
 cdef class Timer:
 	cdef dtime.Timer *p_this
 

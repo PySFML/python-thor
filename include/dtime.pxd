@@ -9,7 +9,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dsystem cimport Time
+from pysfml.dsystem cimport Time
 
 cdef extern from "Thor/Time.hpp" namespace "thor":
 
