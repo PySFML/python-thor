@@ -84,3 +84,49 @@ cdef BigTexture wrap_bigtexture(dgraphics.BigTexture *p):
 	cdef BigTexture r = BigTexture.__new__(BigTexture)
 	r.p_this = p
 	return r
+
+
+cdef class BigSprite(TransformableDrawable):
+	cdef dgraphics.BigSprite *p_this
+	cdef BigTexture           m_texture
+	
+	# TODO: allow to construct an empty BigSprite
+	def __cinit__(self, BigTexture texture):
+		self.p_this = new dgraphics.BigSprite(texture.p_this[0])
+		self.p_drawable = <pysfml.dgraphics.Drawable*>self.p_this
+		self.p_transformable = <pysfml.dgraphics.Transformable*>self.p_this
+
+		m_texture = texture
+		
+	def __dealloc__(self):
+		del self.p_this
+		
+	def draw(self, RenderTarget target, RenderStates states):
+		target.p_rendertarget.draw((<pysfml.dgraphics.Drawable*>self.p_this)[0])
+		
+	property texture:
+		def __get__(self):
+			return NotImplemented
+
+		def __set__(self, BigTexture texture):
+			self.p_this.setTexture(texture.p_this[0])
+			self.m_texture = texture
+			
+	property color:
+		def __get__(self):
+			cdef dgraphics.Color* p = new dgraphics.Color()
+			p[0] = self.p_this.getColor()
+			return wrap_color(p)
+			
+		def __set__(self, Color color):
+			self.p_this.setColor(color.p_this[0])
+
+	property local_bounds:
+		def __get__(self):
+			cdef pysfml.dsystem.FloatRect p = self.p_this.getLocalBounds()
+			return floatrect_to_rectangle(&p)
+		
+	property global_bounds:
+		def __get__(self):
+			cdef pysfml.dsystem.FloatRect p = self.p_this.getGlobalBounds()
+			return floatrect_to_rectangle(&p)
