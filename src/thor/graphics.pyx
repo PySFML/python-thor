@@ -130,3 +130,20 @@ cdef class BigSprite(TransformableDrawable):
 		def __get__(self):
 			cdef pysfml.dsystem.FloatRect p = self.p_this.getGlobalBounds()
 			return floatrect_to_rectangle(&p)
+
+cdef class ColorGradient:
+	cdef dgraphics.ColorGradient *p_this
+
+	def __cinit__(self, Color color=None):
+		if not color:
+			self.p_this = new dgraphics.ColorGradient()
+		else:
+			self.p_this = new dgraphics.ColorGradient(color.p_this[0])
+		
+	def __dealloc__(self):
+		del self.p_this
+
+	def get_color(self, float interpolation):
+		cdef pysfml.dgraphics.Color* p = new pysfml.dgraphics.Color()
+		p[0] = self.p_this.getColor(interpolation)
+		return wrap_color(p)
