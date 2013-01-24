@@ -37,31 +37,31 @@ cdef class Arrow(TransformableDrawable):
 
 	def __dealloc__(self):
 		del self.p_this
-		
+
 	def draw(self, RenderTarget target, RenderStates states):
 		target.p_rendertarget.draw((<dgraphics.Drawable*>self.p_this)[0])
-		
+
 	property direction:
 		def __get__(self):
 			cdef dsystem.Vector2f p = self.p_this.getDirection()
 			return Vector2(p.x, p.y)
-			
+
 		def __set__(self, direction):
 			self.p_this.setDirection(vector2_to_vector2f(direction))
-			
+
 	property thickness:
 		def __get__(self):
 			return self.p_this.getThickness()
-			
+
 		def __set__(self, float thickness):
 			self.p_this.setThickness(thickness)
-			
+
 	property color:
 		def __get__(self):
 			cdef dgraphics.Color* p = new dgraphics.Color()
 			p[0] = self.p_this.getColor()
 			return wrap_color(p)
-			
+
 		def __set__(self, Color color):
 			self.p_this.setColor(color.p_this[0])
 
@@ -69,9 +69,12 @@ cdef class Arrow(TransformableDrawable):
 cdef class ConcaveShape(TransformableDrawable):
 	cdef dshapes.ConcaveShape *p_this
 
-	# TODO: improve constructor
-	def __cinit__(self, position, direction, Color color, float thickness):
-		self.p_this = new dshapes.ConcaveShape()
+	def __init__(self, Shape shape=None):
+		if not shape:
+			self.p_this = new dshapes.ConcaveShape()
+		else:
+			self.p_this = new dshapes.ConcaveShape(shape.p_shape[0])
+
 		self.p_drawable = <dgraphics.Drawable*>self.p_this
 		self.p_transformable = <dgraphics.Transformable*>self.p_this
 
@@ -83,7 +86,7 @@ cdef class ConcaveShape(TransformableDrawable):
 			cdef dgraphics.Color* p = new dgraphics.Color()
 			p[0] = self.p_this.getFillColor()
 			return wrap_color(p)
-			
+
 		def __set__(self, Color color):
 			self.p_this.setFillColor(color.p_this[0])
 

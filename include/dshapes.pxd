@@ -10,7 +10,7 @@
 
 
 from pysfml.dsystem cimport Vector2f
-from pysfml.dgraphics cimport Color, Shape
+from pysfml.dgraphics cimport Color, Shape, ConvexShape
 
 cdef extern from "Thor/Shapes.hpp" namespace "thor":
 
