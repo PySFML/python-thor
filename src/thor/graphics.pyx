@@ -131,7 +131,7 @@ cdef class BigSprite(TransformableDrawable):
 			cdef pysfml.dsystem.FloatRect p = self.p_this.getGlobalBounds()
 			return floatrect_to_rectangle(&p)
 
-cdef class ColorGradient:
+cdef public class ColorGradient[type PyColorGradientType, object PyColorGradientObject]:
 	cdef dgraphics.ColorGradient *p_this
 
 	def __init__(self, Color color):
