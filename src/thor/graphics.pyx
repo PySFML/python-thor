@@ -144,3 +144,8 @@ cdef public class ColorGradient[type PyColorGradientType, object PyColorGradient
 		cdef pysfml.dgraphics.Color* p = new pysfml.dgraphics.Color()
 		p[0] = self.p_this.getColor(interpolation)
 		return wrap_color(p)
+
+cdef api object wrap_colorgradient(dgraphics.ColorGradient *p):
+	cdef ColorGradient r = ColorGradient.__new__(ColorGradient)
+	r.p_this = p
+	return r
