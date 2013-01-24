@@ -36,3 +36,7 @@ cdef extern from "Thor/Graphics.hpp" namespace "thor":
 	cdef cppclass ColorGradient:
 		ColorGradient(Color&)
 		Color getColor(float)
+
+
+cdef extern from "createGradient.hpp" namespace "":
+	object createGradientFromList(object)

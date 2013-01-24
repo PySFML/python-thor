@@ -9,9 +9,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#cimport pysfml.dsystem 
+#cimport pysfml.dsystem
 cimport pysfml.dsystem
-cimport pysfml.dgraphics 
+cimport pysfml.dgraphics
 cimport dgraphics
 
 from pysfml.system cimport Vector2
@@ -28,7 +28,7 @@ cdef Rectangle floatrect_to_rectangle(pysfml.dsystem.FloatRect* floatrect):
 cdef class BigTexture:
 	cdef dgraphics.BigTexture *p_this
 	cdef bint                  delete_this
-	
+
 	def __cinit__(self):
 		self.p_this = new dgraphics.BigTexture()
 		self.delete_this = True
@@ -149,3 +149,6 @@ cdef api object wrap_colorgradient(dgraphics.ColorGradient *p):
 	cdef ColorGradient r = ColorGradient.__new__(ColorGradient)
 	r.p_this = p
 	return r
+
+def create_gradient(object mylist):
+	return dgraphics.createGradientFromList(mylist)
