@@ -128,3 +128,9 @@ cdef ConcaveShape wrap_concaveshape(dshapes.ConcaveShape *p):
 	r.p_drawable = <dgraphics.Drawable*>p
 	r.p_transformable = <dgraphics.Transformable*>p
 	return r
+
+def to_convexshape(Shape shape):
+	cdef dgraphics.ConvexShape *p = new dgraphics.ConvexShape()
+	p[0] = dshapes.toConvexShape(shape.p_shape[0])
+	return wrap_convexshape(p)
+

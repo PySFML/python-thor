@@ -40,7 +40,12 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
 		void setOutlineColor(Color&)
 		Color getFillColor()
 		Color getOutlineColor()
-		setOutlineThickness(float)
+		void setOutlineThickness(float)
 		float getOutlineThickness()
 
 	void swap(ConcaveShape&, ConcaveShape&)
+
+
+cdef extern from "Thor/Shapes.hpp" namespace "thor::Shapes":
+
+	ConvexShape toConvexShape(Shape&)
