@@ -81,6 +81,9 @@ cdef class ConcaveShape(TransformableDrawable):
 	def __dealloc__(self):
 		del self.p_this
 
+	def draw(self, RenderTarget target, RenderStates states):
+		target.p_rendertarget.draw((<dgraphics.Drawable*>self.p_this)[0])
+
 	property fill_color:
 		def __get__(self):
 			cdef dgraphics.Color* p = new dgraphics.Color()
