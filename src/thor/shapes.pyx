@@ -134,3 +134,16 @@ def to_convexshape(Shape shape):
 	p[0] = dshapes.toConvexShape(shape.p_shape[0])
 	return wrap_convexshape(p)
 
+def line(direction, Color color, float thickness=1.0):
+	cdef dgraphics.ConvexShape *p = new dgraphics.ConvexShape()
+	p[0] = dshapes.line(vector2_to_vector2f(direction), color.p_this[0], thickness)
+	return wrap_convexshape(p)
+
+def rounded_rectangle(size, float corner_radius, Color fill_color, float outline_thickness=0.0, Color outline_color=None):
+	cdef dgraphics.ConvexShape *p = new dgraphics.ConvexShape()
+	if not outline_color:
+		p[0] = dshapes.roundedRect(vector2_to_vector2f(size), corner_radius, fill_color.p_this[0], outline_thickness)
+	else:
+		p[0] = dshapes.roundedRect(vector2_to_vector2f(size), corner_radius, fill_color.p_this[0], outline_thickness, outline_color.p_this[0])
+	return wrap_convexshape(p)
+

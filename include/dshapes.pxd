@@ -49,3 +49,11 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
 cdef extern from "Thor/Shapes.hpp" namespace "thor::Shapes":
 
 	ConvexShape toConvexShape(Shape&)
+
+	ConvexShape line(Vector2f, Color&)
+	ConvexShape line(Vector2f, Color&, float)
+
+	ConvexShape roundedRect(Vector2f, float, Color&)
+	ConvexShape roundedRect(Vector2f, float, Color&, float)
+	ConvexShape roundedRect(Vector2f, float, Color&, float, Color&)
+
