@@ -134,12 +134,9 @@ cdef class BigSprite(TransformableDrawable):
 cdef class ColorGradient:
 	cdef dgraphics.ColorGradient *p_this
 
-	def __cinit__(self, Color color=None):
-		if not color:
-			self.p_this = new dgraphics.ColorGradient()
-		else:
-			self.p_this = new dgraphics.ColorGradient(color.p_this[0])
-		
+	def __init__(self, Color color):
+		self.p_this = new dgraphics.ColorGradient(color.p_this[0])
+
 	def __dealloc__(self):
 		del self.p_this
 

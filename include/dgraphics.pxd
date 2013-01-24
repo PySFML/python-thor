@@ -23,7 +23,7 @@ cdef extern from "Thor/Graphics.hpp" namespace "thor":
 		bint loadFromMemory(char*, size_t)
 		#bint loadFromStream(InputStream&)
 		Vector2u getSize()
-		
+
 	cdef cppclass BigSprite:
 		BigSprite()
 		BigSprite(BigTexture&)
@@ -34,6 +34,5 @@ cdef extern from "Thor/Graphics.hpp" namespace "thor":
 		FloatRect getGlobalBounds()
 
 	cdef cppclass ColorGradient:
-		ColorGradient()
 		ColorGradient(Color&)
 		Color getColor(float)
