@@ -9,24 +9,27 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from pysfml cimport dsystem, dgraphics
+
 cimport dshapes
 
 from pysfml.system   cimport Vector2
 from pysfml.graphics cimport Color, wrap_color
 from pysfml.graphics cimport Drawable, TransformableDrawable
+from pysfml.graphics cimport Shape, ConvexShape, wrap_convexshape
 from pysfml.graphics cimport RenderTarget, RenderStates
 
 cdef dsystem.Vector2f vector2_to_vector2f(vector):
 	x, y = vector
 	return dsystem.Vector2f(x, y)
 
+
 cdef class Arrow(TransformableDrawable):
 	cdef dshapes.Arrow *p_this
 
-	# TODO: improve constructor
-	def __cinit__(self, position, direction, Color color, float thickness):
+	def __cinit__(self, position=(0, 0), direction=(0, 0), Color color=Color.WHITE, float thickness=3.0):
 		cdef dsystem.Vector2f cposition = vector2_to_vector2f(position)
 		cdef dsystem.Vector2f cdirection = vector2_to_vector2f(position)
+
 		self.p_this = new dshapes.Arrow(cposition, cdirection, color.p_this[0], thickness)
 
 		self.p_drawable = <dgraphics.Drawable*>self.p_this

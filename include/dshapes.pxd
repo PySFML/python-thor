@@ -27,7 +27,7 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
 		float getThickness()
 		void setColor(Color&)
 		Color getColor()
-	
+
 	cdef cppclass ConcaveShape:
 		ConcaveShape()
 		ConcaveShape(Shape&)
