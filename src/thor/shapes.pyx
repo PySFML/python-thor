@@ -147,3 +147,19 @@ def rounded_rectangle(size, float corner_radius, Color fill_color, float outline
 		p[0] = dshapes.roundedRect(vector2_to_vector2f(size), corner_radius, fill_color.p_this[0], outline_thickness, outline_color.p_this[0])
 	return wrap_convexshape(p)
 
+def polygon(unsigned int nb_points, float radius, Color fill_color, float outline_thickness=0.0, Color outline_color=None):
+	cdef dgraphics.ConvexShape *p = new dgraphics.ConvexShape()
+	if not outline_color:
+		p[0] = dshapes.polygon(nb_points, radius, fill_color.p_this[0], outline_thickness)
+	else:
+		p[0] = dshapes.polygon(nb_points, radius, fill_color.p_this[0], outline_thickness, outline_color.p_this[0])
+	return wrap_convexshape(p)
+
+def star(unsigned int nb_start_points, float inner_radius, float outer_radius, Color fill_color, float outline_thickness=0.0, Color outline_color=None):
+	cdef dgraphics.ConvexShape *p = new dgraphics.ConvexShape()
+	if not outline_color:
+		p[0] = dshapes.star(nb_start_points, inner_radius, outer_radius, fill_color.p_this[0], outline_thickness)
+	else:
+		p[0] = dshapes.star(nb_start_points, inner_radius, outer_radius, fill_color.p_this[0], outline_thickness, outline_color.p_this[0])
+	return wrap_convexshape(p)
+

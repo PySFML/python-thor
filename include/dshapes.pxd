@@ -57,3 +57,10 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor::Shapes":
 	ConvexShape roundedRect(Vector2f, float, Color&, float)
 	ConvexShape roundedRect(Vector2f, float, Color&, float, Color&)
 
+	ConvexShape polygon(unsigned int, float, Color&)
+	ConvexShape polygon(unsigned int, float, Color&, float)
+	ConvexShape polygon(unsigned int, float, Color&, float, Color&)
+
+	ConvexShape star(unsigned int, float, float, Color&)
+	ConvexShape star(unsigned int, float, float, Color&, float)
+	ConvexShape star(unsigned int, float, float, Color&, float, Color&)
