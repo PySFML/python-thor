@@ -32,17 +32,17 @@ concave_shape.outline_color = sf.Color(200, 100, 100)
 # create th.ConcaveShape shape from sf.Shape
 circle = sf.CircleShape(60)
 circle.fill_color = sf.Color(0, 200, 0)
-circle.position = (40, 340)
+circle.move((40, 340))
 
 # create a few predefined shapes
-pie = th.Shapes.pie(60, 135, sf.Color.GREEN)
-polygon = th.Shapes.polygon(7, 60, sf.Color.TRANSPARENT, 3, sf.Color(175, 40, 250))
-star = th.Shapes.star(7, 40, 60, sf.Color(255, 255, 10), 5, sf.Color(250, 190, 20))
+pie = th.pie(60, 135, sf.Color.GREEN)
+polygon = th.polygon(7, 60, sf.Color.TRANSPARENT, 3, sf.Color(175, 40, 250))
+star = th.star(7, 40, 60, sf.Color(255, 255, 10), 5, sf.Color(250, 190, 20))
 
 # move star and polygon shapes
-pie.move(100, 400)
-star.move(500, 100)
-polygon.move(500, 100)
+pie.move((100, 400))
+star.move((500, 100))
+polygon.move((500, 100))
 
 # create an arrow pointing towards the mouse cursor
 arrow = th.Arrow(window.size/2, (0, 0), sf.Color(0, 150, 200))
@@ -55,23 +55,23 @@ running = True
 
 while running:
 	for event in window.events:
-		if event == sf.CloseEvent:
+		if event in [sf.CloseEvent, sf.KeyEvent]:
 			running = False
-			
-		if event == sf.MouseMove:
-			arrow.direction = event.position - window.size / 2
-			
-		# rotate polygon and star
-		elapsed = frame_clock.restart()
-		polygon.rotate(20 * elapsed.seconds)
-		star.rotate(45 * elapsed.seconds)
 
-		# draw everything
-		window.clear()
-		window.draw(concave_shape)
-		window.draw(circle)
-		window.draw(pie)
-		window.draw(polygon)
-		window.draw(star)
-		window.draw(arrow)
-		window.display()
+		if event == sf.MouseMoveEvent:
+			arrow.direction = event.position - window.size / 2
+
+	# rotate polygon and star
+	elapsed = frame_clock.restart()
+	polygon.rotate(20 * elapsed.seconds)
+	star.rotate(45 * elapsed.seconds)
+
+	# draw everything
+	window.clear()
+	window.draw(concave_shape)
+	window.draw(circle)
+	window.draw(pie)
+	window.draw(polygon)
+	window.draw(star)
+	window.draw(arrow)
+	window.display()
