@@ -163,3 +163,10 @@ def star(unsigned int nb_start_points, float inner_radius, float outer_radius, C
 		p[0] = dshapes.star(nb_start_points, inner_radius, outer_radius, fill_color.p_this[0], outline_thickness, outline_color.p_this[0])
 	return wrap_convexshape(p)
 
+def pie(float radius, float filled_angle, Color fill_color, float outline_thickness=0.0, Color outline_color=None):
+	cdef dshapes.ConcaveShape *p = new dshapes.ConcaveShape()
+	if not outline_color:
+		p[0] = dshapes.pie(radius, filled_angle, fill_color.p_this[0], outline_thickness)
+	else:
+		p[0] = dshapes.pie(radius, filled_angle, fill_color.p_this[0], outline_thickness, outline_color.p_this[0])
+	return wrap_concaveshape(p)

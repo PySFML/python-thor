@@ -64,3 +64,7 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor::Shapes":
 	ConvexShape star(unsigned int, float, float, Color&)
 	ConvexShape star(unsigned int, float, float, Color&, float)
 	ConvexShape star(unsigned int, float, float, Color&, float, Color&)
+
+	ConcaveShape pie(float, float, Color&)
+	ConcaveShape pie(float, float, Color&, float)
+	ConcaveShape pie(float, float, Color&, float, Color&)
