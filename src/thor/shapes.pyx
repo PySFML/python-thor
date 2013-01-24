@@ -98,26 +98,33 @@ cdef class ConcaveShape(TransformableDrawable):
 			cdef dgraphics.Color* p = new dgraphics.Color()
 			p[0] = self.p_this.getOutlineColor()
 			return wrap_color(p)
-			
+
 		def __set__(self, Color color):
 			self.p_this.setOutlineColor(color.p_this[0])
-		
+
 	property outline_thickness:
 		def __get__(self):
 			return self.p_this.getOutlineThickness()
-			
+
 		def __set__(self, float thickness):
 			self.p_this.setOutlineThickness(thickness)
 
 	property point_count:
 		def __get__(self):
 			return self.p_this.getPointCount()
-			
+
 		def __set__(self, unsigned int count):
 			self.p_this.setPointCount(count)
-			
+
 	def get_point(self, unsigned int index):
 		return Vector2(self.p_this.getPoint(index).x, self.p_this.getPoint(index).y)
-			
+
 	def set_point(self, unsigned int index, point):
 		self.p_this.setPoint(index, vector2_to_vector2f(point))
+
+cdef ConcaveShape wrap_concaveshape(dshapes.ConcaveShape *p):
+	cdef ConcaveShape r = ConcaveShape.__new__(ConcaveShape)
+	r.p_this = p
+	r.p_drawable = <dgraphics.Drawable*>p
+	r.p_transformable = <dgraphics.Transformable*>p
+	return r
