@@ -28,3 +28,8 @@ cdef public class Connection[type PyConnectionType, object PyConnectionObject]:
 
 	def disconnect(self):
 		self.p_this.disconnect()
+
+cdef Connection wrap_connection(devents.Connection *p):
+	cdef Connection r = Connection.__new__(Connection)
+	r.p_this = p
+	return r

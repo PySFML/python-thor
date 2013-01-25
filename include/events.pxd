@@ -14,3 +14,8 @@ cimport devents
 cdef extern from "events.h":
 	cdef class thor.events.Connection [object PyConnectionObject]:
 		cdef devents.Connection *p_this
+
+cdef inline Connection wrap_connection(devents.Connection *p):
+	cdef Connection r = Connection.__new__(Connection)
+	r.p_this = p
+	return r
