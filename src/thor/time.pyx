@@ -8,73 +8,100 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+
 from pysfml cimport dsystem
-cimport dtime
+cimport dtime, devents
 
 from pysfml.system cimport Time, wrap_time
 
+from events cimport wrap_connection
 
+dtime.PyEval_InitThreads()
 
 cdef class Timer:
-	cdef dtime.Timer *p_this
+	cdef dtime.Timer *p_timer
 
-	def __cinit__(self, *args, **kwargs):
-		self.p_this = new dtime.Timer()
-		
-	def __dealloc__(self):
-		del self.p_this
-		
+	def __init__(self):
+		self.p_timer = new dtime.Timer()
+
+	def __del__(self):
+		del self.p_timer
+
 	def start(self):
-		self.p_this.start()
+		self.p_timer.start()
 
 	def stop(self):
-		self.p_this.stop()
-		
+		self.p_timer.stop()
+
 	property running:
 		def __get__(self):
-			return self.p_this.isRunning()
-			
+			return self.p_timer.isRunning()
+
 	property expired:
 		def __get__(self):
-			return self.p_this.isExpired()
+			return self.p_timer.isExpired()
 
 	def reset(self, Time time_limit):
-		self.p_this.reset(time_limit.p_this[0])
+		self.p_timer.reset(time_limit.p_this[0])
 
 	def restart(self, Time time_limit):
-		self.p_this.restart(time_limit.p_this[0])
+		self.p_timer.restart(time_limit.p_this[0])
 
 	property remaining_time:
 		def __get__(self):
 			cdef dsystem.Time* p = new dsystem.Time()
-			p[0] = self.p_this.getRemainingTime()
+			p[0] = self.p_timer.getRemainingTime()
 			return wrap_time(p)
+
+
+cdef class CallbackTimer(Timer):
+	cdef dtime.CallbackTimer *p_this
+
+	def __init__(self):
+		self.p_this = new dtime.CallbackTimer()
+		self.p_timer = <dtime.Timer*>self.p_this
+
+	def __del__(self):
+		del self.p_this
+
+	def update(self):
+		with nogil: self.p_this.update()
+
+	def connect(self, function):
+		cdef devents.Connection *p = new devents.Connection()
+		p[0] = dtime.CallbackTimer_connect(self.p_this, function)
+		return wrap_connection(p)
+
+	def clear_connections(self):
+		self.p_this.clearConnections()
+
 
 cdef class StopWatch:
 	cdef dtime.StopWatch *p_this
 
-	def __cinit__(self, *args, **kwargs):
+	def __cinit__(self):
 		self.p_this = new dtime.StopWatch()
-		
+
 	def __dealloc__(self):
 		del self.p_this
-		
+
 	def start(self):
 		self.p_this.start()
 
 	def stop(self):
 		self.p_this.stop()
-		
+
 	property running:
 		def __get__(self):
 			return self.p_this.isRunning()
-		
+
 	def reset(self):
 		self.p_this.reset()
 
 	def restart(self):
 		self.p_this.restart()
-		
+
 	property elapsed_time:
 		def __get__(self):
 			cdef dsystem.Time* p = new dsystem.Time()

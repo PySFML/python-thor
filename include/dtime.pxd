@@ -10,6 +10,10 @@
 
 
 from pysfml.dsystem cimport Time
+from devents cimport Connection
+
+cdef extern from "Python.h" namespace "":
+	void PyEval_InitThreads()
 
 cdef extern from "Thor/Time.hpp" namespace "thor":
 
@@ -23,6 +27,13 @@ cdef extern from "Thor/Time.hpp" namespace "thor":
 		void reset(Time)
 		void restart(Time)
 
+	cdef cppclass CallbackTimer:
+		CallbackTimer()
+		void update() nogil
+		# see "CallbackTimer_connect" for Connection connect(Listener&)
+		void clearConnections()
+
+
 	cdef cppclass StopWatch:
 		StopWatch()
 		Time getElapsedTime()
@@ -31,3 +42,6 @@ cdef extern from "Thor/Time.hpp" namespace "thor":
 		void stop()
 		void reset()
 		void restart()
+
+cdef extern from "listeners.hpp" namespace "":
+	Connection CallbackTimer_connect(CallbackTimer*, object)
