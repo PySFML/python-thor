@@ -9,10 +9,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cdef extern from "Thor/Events.hpp" namespace "thor":
+cimport devents
 
-	cdef cppclass Connection:
-		Connection()
-		bint isConnected()
-		void invalidate()
-		void disconnect()
+cdef extern from "events.h":
+	cdef class thor.events.Connection [object PyConnectionObject]:
+		cdef devents.Connection *p_this

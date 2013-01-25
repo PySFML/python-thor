@@ -8,6 +8,23 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 cimport devents
 
-print("hello events!")
+cdef public class Connection[type PyConnectionType, object PyConnectionObject]:
+	cdef devents.Connection *p_this
+
+	def __init__(self):
+		self.p_this = new devents.Connection()
+
+	def __dealloc__(self):
+		del self.p_this
+
+	def is_connected(self):
+		return self.p_this.isConnected()
+
+	def invalidate(self):
+		self.p_this.invalidate()
+
+	def disconnect(self):
+		self.p_this.disconnect()
