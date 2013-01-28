@@ -34,3 +34,10 @@ cdef class PolarVector2:
 
 		def __set__(self, object phi):
 			self.p_this.angle(phi)
+			
+	
+def length(PolarVector2 vector):
+	return dvectors.length(vector.p_this[0])
+
+def polar_angle(PolarVector2 vector):
+	return dvectors.polarAngle(vector.p_this[0])
