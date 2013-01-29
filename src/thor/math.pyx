@@ -14,6 +14,8 @@ cimport dmath
 cimport pysfml.dsystem
 cimport pysfml.dgraphics
 
+from pysfml.system cimport Time
+
 cimport distributions
 
 cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
@@ -93,3 +95,43 @@ def random_dev(float middle, float deviation):
 
 def set_random_seed(unsigned long seed):
 	dmath.setRandomSeed(seed)
+
+
+cdef class Edge:
+	cdef dmath.Edge[unsigned long] *p_this
+	cdef object                     c0, c1
+	cdef unsigned long              p_c0, p_c1
+	
+	def __init__(self, object corner0, object corner1):
+		self.c0, self.c1 = corner0, corner1
+		
+		self.p_c0 = <unsigned long><void*>self.c0
+		self.p_c1 = <unsigned long><void*>self.c1
+		
+		self.p_this = new dmath.Edge[unsigned long](self.p_c0, self.p_c1)
+
+	def __dealloc__(self):
+		del self.p_this
+
+	def __getitem__(self, unsigned int key):
+		return <object><void*>self.p_this[0][key]
+
+cdef class Triangle:
+	cdef dmath.Triangle[unsigned long] *p_this
+	cdef object                         c0, c1, c2
+	cdef unsigned long                  p_c0, p_c1, p_c2
+	
+	def __init__(self, object corner0, object corner1, object corner2):
+		self.c0, self.c1, self.c2 = corner0, corner1, corner2
+		
+		self.p_c0 = <unsigned long><void*>self.c0
+		self.p_c1 = <unsigned long><void*>self.c1
+		self.p_c2 = <unsigned long><void*>self.c2
+		
+		self.p_this = new dmath.Triangle[unsigned long](self.p_c0, self.p_c1, self.p_c2)
+		
+	def __dealloc__(self):
+		del self.p_this
+
+	def __getitem__(self, unsigned int key):
+		return <object><void*>self.p_this[0][key]

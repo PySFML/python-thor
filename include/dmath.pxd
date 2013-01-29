@@ -76,3 +76,11 @@ cdef extern from "Thor/Math.hpp" namespace "thor":
 	float random(float, float)
 	float randomDev(float, float)
 	void setRandomSeed(unsigned long)
+
+	cdef cppclass Edge[V]:
+		Edge(V&, V&)
+		V operator[](unsigned int)
+
+	cdef cppclass Triangle[V]:
+		Triangle(V&, V&, V&)
+		V& operator[](unsigned int)
