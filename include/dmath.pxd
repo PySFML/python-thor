@@ -68,3 +68,11 @@ cdef extern from "DistributionAPI.hpp" namespace "":
 		Distribution[Vector2f] getVector2Functor()
 		Distribution[Time]     getTimeFunctor()
 		Distribution[Color]    getColorFunctor()
+
+cdef extern from "Thor/Math.hpp" namespace "thor":
+
+	int random(int, int)
+	int randomDev(int, int)
+	float random(float, float)
+	float randomDev(float, float)
+	void setRandomSeed(unsigned long)

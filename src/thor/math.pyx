@@ -84,3 +84,12 @@ def deflect(direction, float max_rotation):
 	cdef dmath.Distribution[pysfml.dsystem.Vector2f] *p = new dmath.Distribution[pysfml.dsystem.Vector2f](pysfml.dsystem.Vector2f())
 	p[0] = dmath.distributions.deflect(vector2_to_vector2f(direction), max_rotation)
 	return wrap_vector2distribution(p)
+
+def random(float begin, float end):
+	return dmath.random(begin, end)
+
+def random_dev(float middle, float deviation):
+	return dmath.randomDev(middle, deviation)
+
+def set_random_seed(unsigned long seed):
+	dmath.setRandomSeed(seed)
