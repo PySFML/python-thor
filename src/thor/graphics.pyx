@@ -92,13 +92,15 @@ cdef class BigSprite(TransformableDrawable):
 	cdef dgraphics.BigSprite *p_this
 	cdef BigTexture           m_texture
 
-	# TODO: allow to construct an empty BigSprite
-	def __cinit__(self, BigTexture texture):
-		self.p_this = new dgraphics.BigSprite(texture.p_this[0])
+	def __cinit__(self, BigTexture texture=None):
+		if not texture:
+			self.p_this = new dgraphics.BigSprite()
+		else:
+			self.p_this = new dgraphics.BigSprite(texture.p_this[0])
+			m_texture = texture
+			
 		self.p_drawable = <pysfml.dgraphics.Drawable*>self.p_this
 		self.p_transformable = <pysfml.dgraphics.Transformable*>self.p_this
-
-		m_texture = texture
 
 	def __dealloc__(self):
 		del self.p_this
