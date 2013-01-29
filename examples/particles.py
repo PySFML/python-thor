@@ -32,24 +32,24 @@ emitter.particle_position = lambda: sf.Mouse.get_position(window)
 system = th.ParticleSystem(texture)
 system.add_emitter(emitter)
 
-# build color gradient (green -> teal -> blue)
-gradient = th.createGradient(sf.Color(0, 150, 0))(1)
-                            (sf.Color(0, 150, 0))(1)
-                            (sf.Color(0, 150, 0))
+## build color gradient (green -> teal -> blue)
+gradient = th.create_gradient([sf.Color(0, 150, 0), 1,
+								sf.Color(0, 150, 100), 1,
+								sf.Color(0, 0, 150)])
 
 # create color and fade in/out animations
 colorizer = th.ColorAnimation(gradient)
 fader     = th.FadeAnimation(0.1, 0.1)
 
 # add particle affectors
-system.add_affector(th.AnimationAffector(colorizer))
-system.add_affector(th.AnimationAffector(fader))
+system.add_affector(th.AnimationAffector.from_coloranimation(colorizer))
+system.add_affector(th.AnimationAffector.from_fadeanimation(fader))
 system.add_affector(th.TorqueAffector(100))
 system.add_affector(th.ForceAffector((0, 100)))
 
 # attributes that influence emitter
 position = sf.Vector2()
-velocity = th.PolarVector2()
+velocity = th.PolarVector2(200, -90)
 paused   = False
 
 # load font
@@ -72,30 +72,30 @@ while(True):
 		# [X]: quit
 		if event == sf.CloseEvent:
 			break
-		
+
 		# escape: quit
 		elif event == sf.KeyEvent:
-			if event.pressed: 
+			if event.pressed:
 				break
-		
+
 		# left mouse button: enable/disable glow
-		elif event == sf.ButtonEvent:
+		elif event == sf.MouseButtonEvent and event.pressed:
 			if event.button == sf.Mouse.LEFT:
 				paused = not paused
-		
+
 		# mouse wheel: change emission direction
-		elif event == sf.WheelEvent:
+		elif event == sf.MouseWheelEvent:
 			velocity.phi += 12 * event.delta
-			
-		
+
+
 	# update particle system and emitter
 	frame_time = frame_clock.restart()
 	if not paused:
 		system.update(frame_time)
-		
+
 	# set initial particle velocity, rotate vector randomly by maximal 10 degrees
-	emitter.particle_velocity = th.Distributions.deflect(velocity, 10)
-	
+	emitter.particle_velocity = th.deflect(velocity, 10)
+
 	# draw everything
 	window.clear(sf.Color(30, 30, 30))
 	window.draw(instructions)
