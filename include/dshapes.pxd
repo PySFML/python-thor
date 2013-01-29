@@ -12,6 +12,8 @@
 from pysfml.dsystem cimport Vector2f
 from pysfml.dgraphics cimport Color, Shape, ConvexShape
 
+cimport arrow
+
 cdef extern from "Thor/Shapes.hpp" namespace "thor":
 
 	cdef cppclass Arrow:

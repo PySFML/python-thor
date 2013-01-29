@@ -41,6 +41,14 @@ cdef class Arrow(TransformableDrawable):
 	def draw(self, RenderTarget target, RenderStates states):
 		target.p_rendertarget.draw((<dgraphics.Drawable*>self.p_this)[0])
 
+	@classmethod
+	def get_zero_vector_tolerance(cls):
+		return dshapes.listener.getZeroVectorTolerance()
+
+	@classmethod
+	def set_zero_vector_tolerance(cls, float tolerance):
+		dshapes.listener.setZeroVectorTolerance(tolerance)
+		
 	property direction:
 		def __get__(self):
 			cdef dsystem.Vector2f p = self.p_this.getDirection()
