@@ -11,10 +11,11 @@
 
 cimport dmath
 
-from pysfml.dsystem cimport Vector2f
+from pysfml.dsystem cimport Vector2f, Time
 from pysfml.dgraphics cimport Color
 
 cdef extern from "Thor/Particles.hpp" namespace "thor":
+
 	cdef cppclass Particle:
 		Particle(Time)
 		Vector2f position
@@ -23,3 +24,9 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 		float rotationSpeed
 		Vector2f scale
 		Color color
+
+	cdef Time getPassedLifetime(Particle&)
+	cdef Time getTotalLifetime(Particle&)
+	cdef Time getRemainingLifetime(Particle&)
+	cdef float getPassedRatio(Particle&)
+	cdef float getRemainingRatio(Particle&)

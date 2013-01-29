@@ -14,7 +14,7 @@ cimport dparticles
 cimport pysfml.dsystem
 cimport pysfml.dgraphics
 
-from pysfml.system cimport Time, Vector2
+from pysfml.system cimport Time, wrap_time, Vector2
 from pysfml.graphics cimport Color, wrap_color
 
 cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
@@ -73,3 +73,25 @@ cdef class Particle:
 
 		def __set__(self, Color color):
 			self.p_this.color = color.p_this[0]
+
+
+def get_passed_lifetime(Particle particle):
+	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
+	p[0] = dparticles.getPassedLifetime(particle.p_this[0])
+	return wrap_time(p)
+	
+def get_total_lifetime(Particle particle):
+	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
+	p[0] = dparticles.getTotalLifetime(particle.p_this[0])
+	return wrap_time(p)
+	
+def get_remaining_lifetime(Particle particle):
+	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
+	p[0] = dparticles.getRemainingLifetime(particle.p_this[0])
+	return wrap_time(p)
+
+def get_passed_ratio(Particle particle):
+	return dparticles.getPassedRatio(particle.p_this[0])
+	
+def get_remaining_ratio(Particle particle):
+	return dparticles.getRemainingRatio(particle.p_this[0])
