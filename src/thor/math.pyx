@@ -14,7 +14,7 @@ cimport dmath
 cimport pysfml.dsystem
 cimport pysfml.dgraphics
 
-cdef class Distribution:
+cdef public class Distribution[type PyDistributionType, object PyDistributionObject]:
 	cdef dmath.DistributionAPI *p_this
 
 	# TODO: forbid functions that take arguments
