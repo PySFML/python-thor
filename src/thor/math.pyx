@@ -14,6 +14,12 @@ cimport dmath
 cimport pysfml.dsystem
 cimport pysfml.dgraphics
 
+cimport distributions
+
+cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
+	x, y = vector
+	return pysfml.dsystem.Vector2f(x, y)
+
 cdef public class Distribution[type PyDistributionType, object PyDistributionObject]:
 	cdef dmath.DistributionAPI *p_this
 
@@ -53,3 +59,28 @@ cdef Distribution wrap_colordistribution(dmath.Distribution[pysfml.dgraphics.Col
 	cdef Distribution r = Distribution.__new__(Distribution)
 	r.p_this = <dmath.DistributionAPI*>new dmath.DistributionColor(p[0])
 	return r
+
+def uniform_integer(float begin, float end):
+	cdef dmath.Distribution[float] *p = new dmath.Distribution[float](0)
+	p[0] = dmath.distributions.uniform(begin, end)
+	return wrap_floatdistribution(p)
+
+def uniform_time(Time begin, Time end):
+	cdef dmath.Distribution[pysfml.dsystem.Time] *p = new dmath.Distribution[pysfml.dsystem.Time](pysfml.dsystem.seconds(1))
+	p[0] = dmath.distributions.uniform(<pysfml.dsystem.Time>begin.p_this[0], <pysfml.dsystem.Time>end.p_this[0])
+	return wrap_timedistribution(p)
+
+def rect(center, half_size):
+	cdef dmath.Distribution[pysfml.dsystem.Vector2f] *p = new dmath.Distribution[pysfml.dsystem.Vector2f](pysfml.dsystem.Vector2f())
+	p[0] = dmath.distributions.rect(vector2_to_vector2f(center), vector2_to_vector2f(half_size))
+	return wrap_vector2distribution(p)
+
+def circle(center, float radius):
+	cdef dmath.Distribution[pysfml.dsystem.Vector2f] *p = new dmath.Distribution[pysfml.dsystem.Vector2f](pysfml.dsystem.Vector2f())
+	p[0] = dmath.distributions.circle(vector2_to_vector2f(center), radius)
+	return wrap_vector2distribution(p)
+
+def deflect(direction, float max_rotation):
+	cdef dmath.Distribution[pysfml.dsystem.Vector2f] *p = new dmath.Distribution[pysfml.dsystem.Vector2f](pysfml.dsystem.Vector2f())
+	p[0] = dmath.distributions.deflect(vector2_to_vector2f(direction), max_rotation)
+	return wrap_vector2distribution(p)

@@ -12,6 +12,8 @@
 from pysfml.dsystem cimport Vector2f, Time
 from pysfml.dgraphics cimport Color
 
+cimport distributions
+
 cdef extern from "Thor/Math.hpp" namespace "thor":
 
 	cdef cppclass Distribution[T]:
