@@ -11,11 +11,16 @@
 
 cimport dmath
 
+cdef extern from "<memory>" namespace "std":
+	cdef cppclass shared_ptr[T]:
+		shared_ptr()
+		shared_ptr(T* ptr)
+
 from pysfml.dsystem cimport Vector2f, Time
-from pysfml.dgraphics cimport Color
+from pysfml.dgraphics cimport IntRect
+from pysfml.dgraphics cimport Texture, Color
 
 cdef extern from "Thor/Particles.hpp" namespace "thor":
-
 	cdef cppclass Particle:
 		Particle(Time)
 		Vector2f position
@@ -30,3 +35,23 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef Time getRemainingLifetime(Particle&)
 	cdef float getPassedRatio(Particle&)
 	cdef float getRemainingRatio(Particle&)
+
+	cdef cppclass Affector
+	cdef cppclass Emitter
+
+	cdef cppclass ParticleSystem:
+		ParticleSystem(shared_ptr[Texture])
+		ParticleSystem(shared_ptr[Texture], IntRect&)
+		void swap(ParticleSystem&)
+		void addAffector(shared_ptr[Affector])
+		void addAffector(shared_ptr[Affector], Time)
+		void removeAffector(shared_ptr[Affector])
+		void clearAffectors()
+		bint containsAffector(shared_ptr[Affector])
+		void addEmitter(shared_ptr[Emitter])
+		void addEmitter(shared_ptr[Emitter], Time)
+		void removeEmitter(shared_ptr[Emitter])
+		void clearEmitters()
+		bint containsEmitter(shared_ptr[Emitter])
+		void update(Time)
+		void clearParticles()

@@ -10,16 +10,25 @@
 
 
 cimport dparticles
+from dparticles cimport shared_ptr
 
 cimport pysfml.dsystem
 cimport pysfml.dgraphics
 
 from pysfml.system cimport Time, wrap_time, Vector2
 from pysfml.graphics cimport Color, wrap_color
+from pysfml.graphics cimport Texture
+from pysfml.graphics cimport Drawable
+from pysfml.graphics cimport RenderTarget, RenderStates
 
 cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
 	x, y = vector
 	return pysfml.dsystem.Vector2f(x, y)
+
+cdef pysfml.dsystem.IntRect rectangle_to_intrect(rectangle):
+	l, t, w, h = rectangle
+	return pysfml.dsystem.IntRect(l, t, w, h)
+
 
 cdef class Particle:
 	cdef dparticles.Particle *p_this
@@ -79,12 +88,12 @@ def get_passed_lifetime(Particle particle):
 	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
 	p[0] = dparticles.getPassedLifetime(particle.p_this[0])
 	return wrap_time(p)
-	
+
 def get_total_lifetime(Particle particle):
 	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
 	p[0] = dparticles.getTotalLifetime(particle.p_this[0])
 	return wrap_time(p)
-	
+
 def get_remaining_lifetime(Particle particle):
 	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
 	p[0] = dparticles.getRemainingLifetime(particle.p_this[0])
@@ -92,6 +101,71 @@ def get_remaining_lifetime(Particle particle):
 
 def get_passed_ratio(Particle particle):
 	return dparticles.getPassedRatio(particle.p_this[0])
-	
+
 def get_remaining_ratio(Particle particle):
 	return dparticles.getRemainingRatio(particle.p_this[0])
+
+
+cdef class Emitter:
+	cdef dparticles.Emitter             *p_emitter
+	cdef shared_ptr[dparticles.Emitter]  shared_emitter
+
+
+cdef class Affector:
+	cdef dparticles.Affector             *p_affector
+	cdef shared_ptr[dparticles.Affector]  shared_affector
+
+
+cdef class ParticleSystem(Drawable):
+	cdef dparticles.ParticleSystem *p_this
+
+	def __cinit__(self, Texture texture, rectangle=None):
+		if not rectangle:
+			self.p_this = new dparticles.ParticleSystem(dparticles.shared_ptr[pysfml.dgraphics.Texture](texture.p_this))
+		else:
+			self.p_this = new dparticles.ParticleSystem(dparticles.shared_ptr[pysfml.dgraphics.Texture](texture.p_this), rectangle_to_intrect(rectangle))
+
+	def __dealloc__(self):
+		del self.p_this
+
+	def draw(self, RenderTarget target, RenderStates states):
+		target.p_rendertarget.draw((<pysfml.dgraphics.Drawable*>self.p_this)[0])
+
+	def add_emitter(self, Emitter emitter, Time time_until_removal=None):
+		if not time_until_removal:
+			self.p_this.addEmitter(emitter.shared_emitter)
+		else:
+			self.p_this.addEmitter(emitter.shared_emitter, time_until_removal.p_this[0])
+
+	def remove_emitter(self, Emitter emitter):
+		self.p_this.removeEmitter(emitter.shared_emitter)
+
+	def clear_emitters(self):
+		self.p_this.clearEmitters()
+
+	def contains_emitter(self, Emitter emitter):
+		return self.p_this.containsEmitter(emitter.shared_emitter)
+
+	def add_affector(self, Affector affector, Time time_until_removal=None):
+		if not time_until_removal:
+			self.p_this.addAffector(affector.shared_affector)
+		else:
+			self.p_this.addAffector(affector.shared_affector, time_until_removal.p_this[0])
+
+	def remove_affector(self, Affector affector):
+		self.p_this.removeAffector(affector.shared_affector)
+
+	def clear_affectors(self):
+		self.p_this.clearAffectors()
+
+	def contains_affector(self, Affector affector):
+		return self.p_this.containsAffector(affector.shared_affector)
+
+	def update(self, Time dt):
+		self.p_this.update(dt.p_this[0])
+
+	def clear_particles(self):
+		self.p_this.clearParticles()
+
+	def swap(self, ParticleSystem other):
+		self.p_this.swap(other.p_this[0])
