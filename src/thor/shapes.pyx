@@ -130,6 +130,9 @@ cdef class ConcaveShape(TransformableDrawable):
 	def set_point(self, unsigned int index, point):
 		self.p_this.setPoint(index, vector2_to_vector2f(point))
 
+	def swap(self, ConcaveShape other):
+		self.p_this.swap(other.p_this[0])
+		
 cdef ConcaveShape wrap_concaveshape(dshapes.ConcaveShape *p):
 	cdef ConcaveShape r = ConcaveShape.__new__(ConcaveShape)
 	r.p_this = p
