@@ -21,6 +21,8 @@ from pysfml.graphics cimport Texture
 from pysfml.graphics cimport Drawable
 from pysfml.graphics cimport RenderTarget, RenderStates
 
+from math cimport Distribution
+
 cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
 	x, y = vector
 	return pysfml.dsystem.Vector2f(x, y)
@@ -200,3 +202,60 @@ cdef api object wrap_emitteradder(dparticles.emitter.Adder *p):
 	cdef EmitterAdder r = EmitterAdder.__new__(EmitterAdder)
 	r.p_this = p
 	return r
+
+
+ctypedef fused distributionType:
+	object
+	Distribution
+
+cdef Distribution getDistribution(distributionType distribution):
+	if distributionType is object:
+		return Distribution(distribution)
+	elif distributionType is Distribution:
+		return distribution
+
+cdef class UniversalEmitter(Emitter):
+	cdef dparticles.universalemitter.Ptr p_this
+
+	def __init__(self):
+		self.p_this = dparticles.universalemitter.create()
+		self.p_emitter = dparticles.castUniversalEmitter(self.p_this)
+
+	property emission_rate:
+		def __set__(self, float particles_per_second):
+			self.p_this.get().setEmissionRate(particles_per_second)
+
+	property particle_lifetime:
+		def __set__(self, object particle_lifetime):
+			cdef Distribution distribution = getDistribution(particle_lifetime)
+			self.p_this.get().setParticleLifetime(distribution.p_this.getTimeFunctor())
+
+	property particle_position:
+		def __set__(self, object particle_position):
+			cdef Distribution distribution = getDistribution(particle_position)
+			self.p_this.get().setParticlePosition(distribution.p_this.getVector2Functor())
+
+	property particle_velocity:
+		def __set__(self, object particle_velocity):
+			cdef Distribution distribution = getDistribution(particle_velocity)
+			self.p_this.get().setParticleVelocity(distribution.p_this.getVector2Functor())
+
+	property particle_rotation:
+		def __set__(self, object particle_rotation):
+			cdef Distribution distribution = getDistribution(particle_rotation)
+			self.p_this.get().setParticleRotation(distribution.p_this.getFloatFunctor())
+
+	property particle_rotation_speed:
+		def __set__(self, object particle_rotation_speed):
+			cdef Distribution distribution = getDistribution(particle_rotation_speed)
+			self.p_this.get().setParticleRotationSpeed(distribution.p_this.getFloatFunctor())
+
+	property particle_scale:
+		def __set__(self, object particle_scale):
+			cdef Distribution distribution = getDistribution(particle_scale)
+			self.p_this.get().setParticleScale(distribution.p_this.getVector2Functor())
+
+	property particle_color:
+		def __set__(self, object particle_color):
+			cdef Distribution distribution = getDistribution(particle_color)
+			self.p_this.get().setParticleColor(distribution.p_this.getColorFunctor())

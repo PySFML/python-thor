@@ -75,6 +75,21 @@ cdef extern from "particles/DerivableAffector.hpp" namespace "":
 	cdef cppclass DerivableAffector:
 		DerivableAffector(object)
 
+cimport derivableemitter, derivableaffector
+
+	cdef cppclass UniversalEmitter:
+		UniversalEmitter()
+		void setEmissionRate(float)
+		void setParticleLifetime(dmath.Distribution[Time])
+		void setParticlePosition(dmath.Distribution[Vector2f])
+		void setParticleVelocity(dmath.Distribution[Vector2f])
+		void setParticleRotation(dmath.Distribution[float])
+		void setParticleRotationSpeed(dmath.Distribution[float])
+		void setParticleScale(dmath.Distribution[Vector2f])
+		void setParticleColor(dmath.Distribution[Color])
+
+cimport universalemitter
+
 cimport torqueaffector, scaleaffector, forceaffector, animationaffector
 
 cdef extern from "particles/utilities.hpp":
@@ -84,6 +99,3 @@ cdef extern from "particles/utilities.hpp":
 	affector.Ptr castTorqueAffector(torqueaffector.Ptr)
 	affector.Ptr castScaleAffector(scaleaffector.Ptr)
 	affector.Ptr castForceAffector(forceaffector.Ptr)
-
-
-cimport derivableemitter, derivableaffector
