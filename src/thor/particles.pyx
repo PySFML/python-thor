@@ -176,12 +176,12 @@ cdef class ParticleSystem(Drawable):
 
 
 cdef class EmitterAdder:
-	cdef dparticles.ParticleSystem *p_this
+	cdef dparticles.emitter.Adder *p_this
 
 	def add_particle(self, Particle particle):
-		(<dparticles.emitter.Adder*>self.p_this).addParticle(particle.p_this[0])
+		self.p_this.addParticle(particle.p_this[0])
 
-cdef api object wrap_emitteradder(dparticles.ParticleSystem *p):
+cdef api object wrap_emitteradder(dparticles.emitter.Adder *p):
 	cdef EmitterAdder r = EmitterAdder.__new__(EmitterAdder)
 	r.p_this = p
 	return r

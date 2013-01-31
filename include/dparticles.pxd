@@ -42,6 +42,9 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef cppclass Affector
 	cdef cppclass Emitter
 
+cimport emitter
+
+cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef cppclass ParticleSystem:
 		ParticleSystem(shared_ptr[Texture])
 		ParticleSystem(shared_ptr[Texture], IntRect&)
