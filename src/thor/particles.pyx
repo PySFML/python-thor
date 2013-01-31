@@ -33,7 +33,7 @@ cdef pysfml.dsystem.IntRect rectangle_to_intrect(rectangle):
 cdef class Particle:
 	cdef dparticles.Particle *p_this
 
-	def __cinit__(self, Time total_lifetime):
+	def __init__(self, Time total_lifetime):
 		self.p_this = new dparticles.Particle(total_lifetime.p_this[0])
 
 	def __dealloc__(self):
@@ -83,6 +83,10 @@ cdef class Particle:
 		def __set__(self, Color color):
 			self.p_this.color = color.p_this[0]
 
+cdef api object wrap_particle(dparticles.Particle *p):
+	cdef Particle r = Particle.__new__(Particle)
+	r.p_this = p
+	return r
 
 def get_passed_lifetime(Particle particle):
 	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
