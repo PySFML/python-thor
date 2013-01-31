@@ -42,7 +42,7 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef cppclass Affector
 	cdef cppclass Emitter
 
-cimport emitter
+cimport emitter, affector
 
 cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef cppclass ParticleSystem:
@@ -61,3 +61,13 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 		bint containsEmitter(shared_ptr[Emitter])
 		void update(Time)
 		void clearParticles()
+
+cdef extern from "particles/DerivableEmitter.hpp" namespace "":
+	cdef cppclass DerivableEmitter:
+		DerivableEmitter(object)
+
+cdef extern from "particles/DerivableAffector.hpp" namespace "":
+	cdef cppclass DerivableAffector:
+		DerivableAffector(object)
+
+cimport derivableemitter, derivableaffector

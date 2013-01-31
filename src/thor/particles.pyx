@@ -111,14 +111,29 @@ def get_remaining_ratio(Particle particle):
 
 
 cdef class Emitter:
-	cdef dparticles.Emitter             *p_emitter
-	cdef shared_ptr[dparticles.Emitter]  shared_emitter
+	cdef dparticles.emitter.Ptr p_emitter
+
+	def __init__(self):
+		if self.__class__ == Emitter:
+			raise Exception("Emitter is abstract")
+
+		self.p_emitter = dparticles.derivableemitter.create(self)
+
+	def emit(self, EmitterAdder system, Time dt):
+		pass
 
 
 cdef class Affector:
-	cdef dparticles.Affector             *p_affector
-	cdef shared_ptr[dparticles.Affector]  shared_affector
+	cdef dparticles.affector.Ptr p_affector
 
+	def __init__(self):
+		if self.__class__ == Affector:
+			raise Exception("Affector is abstract")
+
+		self.p_affector = dparticles.derivableaffector.create(self)
+
+	def affect(self, Particle particle, Time dt):
+		pass
 
 cdef class ParticleSystem(Drawable):
 	cdef dparticles.ParticleSystem *p_this
@@ -137,33 +152,33 @@ cdef class ParticleSystem(Drawable):
 
 	def add_emitter(self, Emitter emitter, Time time_until_removal=None):
 		if not time_until_removal:
-			self.p_this.addEmitter(emitter.shared_emitter)
+			self.p_this.addEmitter(emitter.p_emitter)
 		else:
-			self.p_this.addEmitter(emitter.shared_emitter, time_until_removal.p_this[0])
+			self.p_this.addEmitter(emitter.p_emitter, time_until_removal.p_this[0])
 
 	def remove_emitter(self, Emitter emitter):
-		self.p_this.removeEmitter(emitter.shared_emitter)
+		self.p_this.removeEmitter(emitter.p_emitter)
 
 	def clear_emitters(self):
 		self.p_this.clearEmitters()
 
 	def contains_emitter(self, Emitter emitter):
-		return self.p_this.containsEmitter(emitter.shared_emitter)
+		return self.p_this.containsEmitter(emitter.p_emitter)
 
 	def add_affector(self, Affector affector, Time time_until_removal=None):
 		if not time_until_removal:
-			self.p_this.addAffector(affector.shared_affector)
+			self.p_this.addAffector(affector.p_affector)
 		else:
-			self.p_this.addAffector(affector.shared_affector, time_until_removal.p_this[0])
+			self.p_this.addAffector(affector.p_affector, time_until_removal.p_this[0])
 
 	def remove_affector(self, Affector affector):
-		self.p_this.removeAffector(affector.shared_affector)
+		self.p_this.removeAffector(affector.p_affector)
 
 	def clear_affectors(self):
 		self.p_this.clearAffectors()
 
 	def contains_affector(self, Affector affector):
-		return self.p_this.containsAffector(affector.shared_affector)
+		return self.p_this.containsAffector(affector.p_affector)
 
 	def update(self, Time dt):
 		self.p_this.update(dt.p_this[0])
