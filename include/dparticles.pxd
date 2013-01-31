@@ -62,6 +62,11 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 		void update(Time)
 		void clearParticles()
 
+	cdef cppclass ForceAffector
+	cdef cppclass ScaleAffector
+	cdef cppclass TorqueAffector
+	cdef cppclass AnimationAffector
+
 cdef extern from "particles/DerivableEmitter.hpp" namespace "":
 	cdef cppclass DerivableEmitter:
 		DerivableEmitter(object)
@@ -69,5 +74,16 @@ cdef extern from "particles/DerivableEmitter.hpp" namespace "":
 cdef extern from "particles/DerivableAffector.hpp" namespace "":
 	cdef cppclass DerivableAffector:
 		DerivableAffector(object)
+
+cimport torqueaffector, scaleaffector, forceaffector, animationaffector
+
+cdef extern from "particles/utilities.hpp":
+	emitter.Ptr castUniversalEmitter(universalemitter.Ptr)
+
+	affector.Ptr castAnimationAffector(animationaffector.Ptr)
+	affector.Ptr castTorqueAffector(torqueaffector.Ptr)
+	affector.Ptr castScaleAffector(scaleaffector.Ptr)
+	affector.Ptr castForceAffector(forceaffector.Ptr)
+
 
 cimport derivableemitter, derivableaffector
