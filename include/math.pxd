@@ -11,6 +11,6 @@
 
 cimport dmath
 
-cdef extern from "math.h":
+cdef extern from "math/math.h":
 	cdef class thor.math.Distribution [object PyDistributionObject]:
 		cdef dmath.DistributionAPI *p_this
