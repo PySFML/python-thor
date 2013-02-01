@@ -155,7 +155,7 @@ thor::Distribution<sf::Color> DistributionTime::getColorFunctor()
 
 
 DistributionColor::DistributionColor(thor::Distribution<sf::Color> distribution) :
-DistributionColor (ColorToObjectFunctor(distribution)),
+DistributionAPI (ColorToObjectFunctor(distribution)),
 m_distribution(distribution)
 {
 }
@@ -318,5 +318,5 @@ sf::Color ObjectToColorFunctor::operator() () const
 {
 	PyObject* response = PyObject_CallFunctionObjArgs(m_object, NULL);
 	PyColorObject* color = (PyColorObject*)(response);
-	return *color->p_this[0];
+	return *color->p_this;
 }
