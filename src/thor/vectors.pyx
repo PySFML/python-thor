@@ -44,6 +44,10 @@ cdef class PolarVector2:
 			self.p_this.angle(phi)
 			self.phi = phi
 
+	def to_vector2(self):
+		r, phi = self.r, self.phi
+		return (r*cos(phi), r*sin(phi))
+
 def length(PolarVector2 vector):
 	return dvectors.length(vector.p_this[0])
 
