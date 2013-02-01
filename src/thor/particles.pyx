@@ -143,6 +143,8 @@ cdef class ParticleSystem(Drawable):
 	cdef dparticles.ParticleSystem *p_this
 
 	def __cinit__(self, Texture texture, rectangle=None):
+		texture.delete_this = False
+
 		if not rectangle:
 			self.p_this = new dparticles.ParticleSystem(dparticles.shared_ptr[pysfml.dgraphics.Texture](texture.p_this))
 		else:
