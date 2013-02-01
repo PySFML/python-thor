@@ -11,6 +11,11 @@
 
 from pysfml.dsystem cimport Vector2Object, Vector3Object
 
+cdef extern from "Thor/Vectors.hpp" namespace "thor":
+	cdef cppclass PolarVector2[T]:
+		PolarVector2()
+		PolarVector2(T, T)
+		
 cdef extern from "vectors/PolarVector2Object.hpp" namespace "":
 	cdef cppclass PolarVector2Object:
 		PolarVector2Object()
