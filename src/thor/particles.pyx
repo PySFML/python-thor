@@ -259,3 +259,35 @@ cdef class UniversalEmitter(Emitter):
 		def __set__(self, object particle_color):
 			cdef Distribution distribution = getDistribution(particle_color)
 			self.p_this.get().setParticleColor(distribution.p_this.getColorFunctor())
+
+
+cdef class ForceAffector(Affector):
+	cdef shared_ptr[dparticles.ForceAffector] p_this
+
+	def __init__(self, acceleration):
+		self.p_this = dparticles.forceaffector.create(vector2_to_vector2f(acceleration))
+		self.p_affector = dparticles.castForceAffector(self.p_this)
+
+	property acceleration:
+		def __get__(self):
+			cdef pysfml.dsystem.Vector2f p
+			p = self.p_this.get().getAcceleration()
+			return Vector2(p.x, p.y)
+
+		def __set__(self, acceleration):
+			self.p_this.get().setAcceleration(vector2_to_vector2f(acceleration))
+
+
+cdef class TorqueAffector(Affector):
+	cdef shared_ptr[dparticles.TorqueAffector] p_this
+
+	def __init__(self, float angular_acceleration):
+		self.p_this = dparticles.torqueaffector.create(angular_acceleration)
+		self.p_affector = dparticles.castTorqueAffector(self.p_this)
+
+	property angular_acceleration:
+		def __get__(self):
+			return self.p_this.get().getAngularAcceleration()
+
+		def __set__(self, float angular_acceleration):
+			self.p_this.get().setAngularAcceleration(angular_acceleration)

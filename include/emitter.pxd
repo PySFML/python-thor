@@ -9,8 +9,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from dparticles cimport shared_ptr
+from dparticles cimport Emitter
 from dparticles cimport Particle
 
 cdef extern from "Thor/Particles.hpp" namespace "thor::Emitter":
+	ctypedef shared_ptr[Emitter] Ptr
+
 	cdef cppclass Adder:
 		void addParticle(Particle&)

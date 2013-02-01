@@ -15,6 +15,8 @@ cdef extern from "<memory>" namespace "std":
 	cdef cppclass shared_ptr[T]:
 		shared_ptr()
 		shared_ptr(T* ptr)
+		T* get()
+		long use_count()
 
 from pysfml.dsystem cimport Vector2f, Time
 from pysfml.dgraphics cimport IntRect
@@ -23,7 +25,6 @@ from pysfml.dgraphics cimport Texture, Color
 cimport emitter
 
 cdef extern from "Thor/Particles.hpp" namespace "thor":
-
 	cdef cppclass Particle:
 		Particle(Time)
 		Vector2f position
@@ -62,11 +63,6 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 		void update(Time)
 		void clearParticles()
 
-	cdef cppclass ForceAffector
-	cdef cppclass ScaleAffector
-	cdef cppclass TorqueAffector
-	cdef cppclass AnimationAffector
-
 cdef extern from "particles/DerivableEmitter.hpp" namespace "":
 	cdef cppclass DerivableEmitter:
 		DerivableEmitter(object)
@@ -77,6 +73,7 @@ cdef extern from "particles/DerivableAffector.hpp" namespace "":
 
 cimport derivableemitter, derivableaffector
 
+cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef cppclass UniversalEmitter:
 		UniversalEmitter()
 		void setEmissionRate(float)
@@ -89,6 +86,24 @@ cimport derivableemitter, derivableaffector
 		void setParticleColor(dmath.Distribution[Color])
 
 cimport universalemitter
+
+
+cdef extern from "Thor/Particles.hpp" namespace "thor":
+	cdef cppclass ForceAffector:
+		ForceAffector(Vector2f)
+		void affect(Particle&, Time)
+		Vector2f getAcceleration()
+		void setAcceleration(Vector2f)
+
+	cdef cppclass ScaleAffector
+
+	cdef cppclass TorqueAffector:
+		TorqueAffector(float)
+		void affect(Particle&, Time)
+		void setAngularAcceleration(float)
+		float getAngularAcceleration()
+
+	cdef cppclass AnimationAffector
 
 cimport torqueaffector, scaleaffector, forceaffector, animationaffector
 
