@@ -13,9 +13,10 @@ import sfml as sf
 import thor as th
 
 def find_vertex(vertices, position):
-	for itr in vertices:
-		th.squared_length(position - itr) <= 36:
-			return itr
+	return
+	#for itr in vertices:
+		#th.squared_length(position - itr) <= 36:
+			#return itr
 
 def handle_vertex_click(mouse_event, vertices):
 	# handles clicks on a vertex
@@ -35,13 +36,13 @@ def handle_vertex_click(mouse_event, vertices):
 	# remove point when right-clicking
 	if mouse_event.button == sf.Mouse.RIGHT:
 		vertex = find_vertex(vertices, click_pos)
-		
+
 		if vertex:
-			try: 
+			try:
 				vertices.remove(click_pos)
-			except ValueError: 
+			except ValueError:
 				pass
-			
+
 			return True
 
 	return False
@@ -114,7 +115,7 @@ while running:
 		triangle.outline_thickness = 1
 		for i in range(3):
 			triangle.set_point(i, itr[i])
-			
+
 		window.draw(triangle)
 
 	# draw all points
@@ -123,7 +124,7 @@ while running:
 		circle.position = itr - (6, 6)
 		circle.radius = 6
 		circle.fill_color = sf.Color(255, 0, 150)
-		
+
 		window.draw(circle)
 
 	# draw description and update screen

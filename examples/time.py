@@ -51,7 +51,7 @@ timer_measurement.color = sf.Color(0, 140, 190)
 
 
 # connect timer with callback (colorize yellow) invoked at expiration time
-def set_timer_measurement_color_to_yellow():
+def set_timer_measurement_color_to_yellow(timer):
 	timer_measurement.color = sf.Color.YELLOW
 
 timer.connect(set_timer_measurement_color_to_yellow)

@@ -42,8 +42,8 @@ colorizer = th.ColorAnimation(gradient)
 fader     = th.FadeAnimation(0.1, 0.1)
 
 # add particle affectors
-system.add_affector(th.AnimationAffector.from_coloranimation(colorizer))
-system.add_affector(th.AnimationAffector.from_fadeanimation(fader))
+system.add_affector(th.AnimationAffector.create(colorizer))
+system.add_affector(th.AnimationAffector.create(fader))
 system.add_affector(th.TorqueAffector(100))
 system.add_affector(th.ForceAffector((0, 100)))
 
@@ -94,7 +94,7 @@ while(True):
 		system.update(frame_time)
 
 	# set initial particle velocity, rotate vector randomly by maximal 10 degrees
-	emitter.particle_velocity = th.deflect(velocity, 10)
+	emitter.particle_velocity = th.deflect(velocity.to_vector2(), 10)
 
 	# draw everything
 	window.clear(sf.Color(30, 30, 30))
