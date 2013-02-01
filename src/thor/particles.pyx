@@ -291,3 +291,27 @@ cdef class TorqueAffector(Affector):
 
 		def __set__(self, float angular_acceleration):
 			self.p_this.get().setAngularAcceleration(angular_acceleration)
+
+
+cimport danimation
+from animation cimport FrameAnimation, ColorAnimation, FadeAnimation
+
+ctypedef fused AnimationFunction:
+	ColorAnimation
+	FadeAnimation
+
+cdef class AnimationAffector(Affector):
+	cdef shared_ptr[dparticles.AnimationAffector] p_this
+
+	@classmethod
+	def create(cls, AnimationFunction particle_animation):
+		cdef AnimationAffector r = AnimationAffector.__new__(AnimationAffector)
+
+		if AnimationFunction is ColorAnimation:
+			r.p_this = dparticles.animationaffector.create(<danimation.ColorAnimation>particle_animation.p_this[0])
+			r.p_affector = dparticles.castAnimationAffector(r.p_this)
+		elif AnimationFunction is FadeAnimation:
+			r.p_this = dparticles.animationaffector.create(<danimation.FadeAnimation>particle_animation.p_this[0])
+			r.p_affector = dparticles.castAnimationAffector(r.p_this)
+
+		return r

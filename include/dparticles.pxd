@@ -22,8 +22,6 @@ from pysfml.dsystem cimport Vector2f, Time
 from pysfml.dgraphics cimport IntRect
 from pysfml.dgraphics cimport Texture, Color
 
-cimport emitter
-
 cdef extern from "Thor/Particles.hpp" namespace "thor":
 	cdef cppclass Particle:
 		Particle(Time)
