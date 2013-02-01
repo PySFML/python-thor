@@ -26,3 +26,15 @@ cdef extern from "Thor/Animation.hpp" namespace "thor":
 
 	cdef cppclass FadeAnimation:
 		FadeAnimation(float, float)
+
+	cdef cppclass Animator[Animated, Id]:
+		Animator()
+		void addAnimation(Id&, FrameAnimation&, Time)
+		void addAnimation(Id&, ColorAnimation&, Time)
+		void addAnimation(Id&, FadeAnimation&, Time)
+		void playAnimation(Id&)
+		void playAnimation(Id&, bint)
+		void stopAnimation()
+		bint isPlayingAnimation()
+		void update(Time)
+		void animate(Animated&)

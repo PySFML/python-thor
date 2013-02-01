@@ -55,3 +55,40 @@ cdef public class FadeAnimation[type PyFadeAnimationType, object PyFadeAnimation
 
 	def __dealloc__(self):
 		del self.p_this
+
+ctypedef fused AnimationFunction:
+	FrameAnimation
+	ColorAnimation
+	FadeAnimation
+
+cdef class Animator:
+	cdef danimation.Animator[pysfml.dgraphics.Sprite, string] *p_this
+
+	def __cinit__(self, *args, **kwargs):
+		self.p_this = new danimation.Animator[pysfml.dgraphics.Sprite, string]()
+
+	def __dealloc__(self):
+		del self.p_this
+
+	def add_animation(self, string id, AnimationFunction animation, Time duration):
+		if AnimationFunction is FrameAnimation:
+			self.p_this.addAnimation(<string>id, (<danimation.FrameAnimation*>animation.p_this)[0], (<pysfml.dgraphics.Time*>duration.p_this)[0])
+		elif AnimationFunction is ColorAnimation:
+			self.p_this.addAnimation(<string>id, (<danimation.ColorAnimation*>animation.p_this)[0], (<pysfml.dgraphics.Time*>duration.p_this)[0])
+		elif AnimationFunction is FadeAnimation:
+			self.p_this.addAnimation(<string>id, (<danimation.FadeAnimation*>animation.p_this)[0], (<pysfml.dgraphics.Time*>duration.p_this)[0])
+
+	def play_animation(self, string id, bint loop=False):
+		self.p_this.playAnimation(id, loop)
+
+	def stop_animation(self):
+		self.p_this.stopAnimation()
+
+	def is_playing_animation(self):
+		return self.p_this.isPlayingAnimation()
+
+	def update(self, Time dt):
+		self.p_this.update(dt.p_this[0])
+
+	def animate(self, Sprite animated):
+		self.p_this.animate(animated.p_this[0])
