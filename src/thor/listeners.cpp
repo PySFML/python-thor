@@ -11,20 +11,26 @@
 
 
 #include "listeners.hpp"
-
+#include "time_api.h"
+#include <iostream>
 struct CallPythonFunction
 {
 	CallPythonFunction(PyObject* object)
 	: object(object)
 	{
+		import_thor__time();
 	}
 
-	void operator()(thor::CallbackTimer&)
+	void operator()(thor::CallbackTimer& timer)
 	{
 		PyGILState_STATE gstate;
 		gstate = PyGILState_Ensure();
 
-		PyObject_CallFunctionObjArgs(object, NULL);
+		//static char format[] = "O";
+
+		PyObject* timer_object = (PyObject*)(wrap_callbacktimer(&timer));
+		PyObject_CallFunctionObjArgs(object, timer_object, NULL);
+
 
 		PyGILState_Release(gstate);
 	}

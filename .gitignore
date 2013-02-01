@@ -4,6 +4,8 @@ install.sh
 doc/build
 build/
 
+include/math
+
 src/thor/events.cpp
 src/thor/graphics.cpp
 src/thor/animation.cpp

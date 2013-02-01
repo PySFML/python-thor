@@ -101,13 +101,13 @@ cdef class Edge:
 	cdef dmath.Edge[unsigned long] *p_this
 	cdef object                     c0, c1
 	cdef unsigned long              p_c0, p_c1
-	
+
 	def __init__(self, object corner0, object corner1):
 		self.c0, self.c1 = corner0, corner1
-		
+
 		self.p_c0 = <unsigned long><void*>self.c0
 		self.p_c1 = <unsigned long><void*>self.c1
-		
+
 		self.p_this = new dmath.Edge[unsigned long](self.p_c0, self.p_c1)
 
 	def __dealloc__(self):
@@ -120,18 +120,60 @@ cdef class Triangle:
 	cdef dmath.Triangle[unsigned long] *p_this
 	cdef object                         c0, c1, c2
 	cdef unsigned long                  p_c0, p_c1, p_c2
-	
+
 	def __init__(self, object corner0, object corner1, object corner2):
 		self.c0, self.c1, self.c2 = corner0, corner1, corner2
-		
+
 		self.p_c0 = <unsigned long><void*>self.c0
 		self.p_c1 = <unsigned long><void*>self.c1
 		self.p_c2 = <unsigned long><void*>self.c2
-		
+
 		self.p_this = new dmath.Triangle[unsigned long](self.p_c0, self.p_c1, self.p_c2)
-		
+
 	def __dealloc__(self):
 		del self.p_this
 
 	def __getitem__(self, unsigned int key):
 		return <object><void*>self.p_this[0][key]
+
+
+cdef api object create_triangle(object c1, object c2, object c3):
+	return Triangle(c1, c2, c3)
+
+cdef api object wrap_triangle(dmath.Triangle[unsigned long] *p):
+	cdef Triangle r = Triangle.__new__(Triangle)
+
+	r.c0 = <object><void*>p[0][0]
+	r.c1 = <object><void*>p[0][1]
+	r.c2 = <object><void*>p[0][2]
+
+	r.p_c0 = <unsigned long><void*>r.c0
+	r.p_c1 = <unsigned long><void*>r.c1
+	r.p_c2 = <unsigned long><void*>r.c2
+
+	r.p_this = p
+
+	return r
+
+
+def triangulate(vertices):
+	return dmath.triangulate(vertices)
+
+#def triangulate_constrained():
+	#raise NotImplemented
+
+#def triangulate_polygon():
+	#raise NotImplemented
+
+#def to_degree():
+	#raise NotImplemented
+
+#def to_radian():
+	#raise NotImplemented
+
+#def swap():
+	#raise NotImplemented
+
+## PI
+
+

@@ -84,3 +84,12 @@ cdef extern from "Thor/Math.hpp" namespace "thor":
 	cdef cppclass Triangle[V]:
 		Triangle(V&, V&, V&)
 		V& operator[](unsigned int)
+
+
+cdef extern from "triangulation.hpp" namespace "":
+	#Triangle[void*]* Triangle_initialization(void*, void*, void*)
+	#void* Triangle_get(Triangle[void*]&, unsigned int)
+
+	object triangulate(object)
+	void triangulateConstrained(object)
+	void triangulatePolygon(object)

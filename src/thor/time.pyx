@@ -9,7 +9,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 from pysfml cimport dsystem
 cimport dtime, devents
 
@@ -68,7 +67,7 @@ cdef class CallbackTimer(Timer):
 	def update(self):
 		with nogil: self.p_this.update()
 
-	def connect(self, function):
+	def connect(self, function, *args, **kwargs):
 		cdef devents.Connection *p = new devents.Connection()
 		p[0] = dtime.CallbackTimer_connect(self.p_this, function)
 		return wrap_connection(p)
@@ -76,7 +75,13 @@ cdef class CallbackTimer(Timer):
 	def clear_connections(self):
 		self.p_this.clearConnections()
 
-
+cdef api object wrap_callbacktimer(dtime.CallbackTimer *p):
+	cdef CallbackTimer r = CallbackTimer.__new__(CallbackTimer)
+	r.p_this = p
+	r.p_timer = <dtime.Timer*>p
+	return r
+	
+	
 cdef class StopWatch:
 	cdef dtime.StopWatch *p_this
 

@@ -14,7 +14,10 @@
 #define PYTHOR_UTILITIES_HPP
 
 #include <memory>
+#include <SFML/Graphics.hpp>
 #include <Thor/Particles.hpp>
+
+//std::shared_ptr<sf::Texture> makeTextureShared(sf::Texture*);
 
 thor::Emitter::Ptr castUniversalEmitter(thor::UniversalEmitter::Ptr);
 
