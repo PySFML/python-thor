@@ -7,3 +7,22 @@
 # This software is released under the LGPLv3 license.
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+from pysfml.dsystem cimport Vector2f, Time
+from pysfml.dgraphics cimport IntRect
+from pysfml.dgraphics cimport Texture, Color
+
+from dgraphics cimport ColorGradient
+
+cdef extern from "Thor/Animation.hpp" namespace "thor":
+
+	cdef cppclass FrameAnimation:
+		FrameAnimation()
+		void addFrame(float, IntRect&)
+
+	cdef cppclass ColorAnimation:
+		ColorAnimation(ColorGradient&)
+
+	cdef cppclass FadeAnimation:
+		FadeAnimation(float, float)
