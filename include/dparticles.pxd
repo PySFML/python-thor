@@ -93,7 +93,11 @@ cdef extern from "Thor/Particles.hpp" namespace "thor":
 		Vector2f getAcceleration()
 		void setAcceleration(Vector2f)
 
-	cdef cppclass ScaleAffector
+	cdef cppclass ScaleAffector:
+		ScaleAffector(Vector2f)
+		void affect(Particle&, Time)
+		Vector2f getScaleFactor()
+		void setScaleFactor(Vector2f)
 
 	cdef cppclass TorqueAffector:
 		TorqueAffector(float)

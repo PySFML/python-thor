@@ -21,6 +21,8 @@ from pysfml.graphics cimport Texture
 from pysfml.graphics cimport Drawable
 from pysfml.graphics cimport RenderTarget, RenderStates
 
+cimport danimation
+from animation cimport FrameAnimation, ColorAnimation, FadeAnimation
 from math cimport Distribution
 
 cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
@@ -293,9 +295,6 @@ cdef class TorqueAffector(Affector):
 			self.p_this.get().setAngularAcceleration(angular_acceleration)
 
 
-cimport danimation
-from animation cimport FrameAnimation, ColorAnimation, FadeAnimation
-
 ctypedef fused AnimationFunction:
 	ColorAnimation
 	FadeAnimation
@@ -315,3 +314,20 @@ cdef class AnimationAffector(Affector):
 			r.p_affector = dparticles.castAnimationAffector(r.p_this)
 
 		return r
+
+
+cdef class ScaleAffector(Affector):
+	cdef shared_ptr[dparticles.ScaleAffector] p_this
+
+	def __init__(self, scale_factor):
+		self.p_this = dparticles.scaleaffector.create(vector2_to_vector2f(scale_factor))
+		self.p_affector = dparticles.castScaleAffector(self.p_this)
+
+	property scale_factor:
+		def __get__(self):
+			cdef pysfml.dsystem.Vector2f p
+			p = self.p_this.get().getScaleFactor()
+			return Vector2(p.x, p.y)
+
+		def __set__(self, scale_factor):
+			self.p_this.get().setScaleFactor(vector2_to_vector2f(scale_factor))
