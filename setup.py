@@ -89,7 +89,7 @@ extensions = [extension(module) for module in modules]
 
 math_ext = Extension(
 	'thor.' + 'math',
-	sources=["src/thor/" + 'math' + file_extension, 'src/thor/DistributionAPI.cpp', 'src/thor/triangulation.cpp'],
+	sources=["src/thor/" + 'math' + file_extension, 'src/thor/DistributionAPI.cpp'],
 	include_dirs=['include', sfml_include, sfml_include2],
 	language='c++',
 	extra_compile_args = ['--std=c++0x', '-DNDEBUG'],
