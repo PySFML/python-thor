@@ -9,36 +9,27 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cimport dparticles
-from dparticles cimport shared_ptr
+cimport libcpp.sfml as sf
+cimport libcpp.thor as th
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport FrameAnimation, ColorAnimation, FadeAnimation
 
-cimport pysfml.dsystem
-cimport pysfml.dgraphics
-
-from pysfml.system cimport Time, wrap_time, Vector2
+from pysfml.system cimport Vector2, to_vector2f
+from pysfml.system cimport Time, wrap_time
+from pysfml.graphics cimport to_intrect
 from pysfml.graphics cimport Color, wrap_color
 from pysfml.graphics cimport Texture
 from pysfml.graphics cimport Drawable
 from pysfml.graphics cimport RenderTarget, RenderStates
 
-cimport danimation
-from animation cimport FrameAnimation, ColorAnimation, FadeAnimation
-from math cimport Distribution
-
-cdef pysfml.dsystem.Vector2f vector2_to_vector2f(vector):
-	x, y = vector
-	return pysfml.dsystem.Vector2f(x, y)
-
-cdef pysfml.dsystem.IntRect rectangle_to_intrect(rectangle):
-	l, t, w, h = rectangle
-	return pysfml.dsystem.IntRect(l, t, w, h)
+from pythor.math cimport Distribution
 
 
 cdef class Particle:
-	cdef dparticles.Particle *p_this
+	cdef th.Particle *p_this
 
 	def __init__(self, Time total_lifetime):
-		self.p_this = new dparticles.Particle(total_lifetime.p_this[0])
+		self.p_this = new th.Particle(total_lifetime.p_this[0])
 
 	def __dealloc__(self):
 		del self.p_this
@@ -48,14 +39,14 @@ cdef class Particle:
 			return Vector2(self.p_this.position.x, self.p_this.position.y)
 
 		def __set__(self, position):
-			self.p_this.position = vector2_to_vector2f(position)
+			self.p_this.position = to_vector2f(position)
 
 	property velocity:
 		def __get__(self):
 			return Vector2(self.p_this.velocity.x, self.p_this.velocity.y)
 
 		def __set__(self, velocity):
-			self.p_this.velocity = vector2_to_vector2f(velocity)
+			self.p_this.velocity = to_vector2f(velocity)
 
 	property rotation:
 		def __get__(self):
@@ -76,85 +67,85 @@ cdef class Particle:
 			return Vector2(self.p_this.scale.x, self.p_this.scale.y)
 
 		def __set__(self, scale):
-			self.p_this.scale = vector2_to_vector2f(scale)
+			self.p_this.scale = to_vector2f(scale)
 
 	property color:
 		def __get__(self):
-			cdef pysfml.dgraphics.Color* p = new pysfml.dgraphics.Color()
+			cdef sf.Color* p = new sf.Color()
 			p[0] = self.p_this.color
 			return wrap_color(p)
 
 		def __set__(self, Color color):
 			self.p_this.color = color.p_this[0]
 
-cdef api object wrap_particle(dparticles.Particle *p):
+cdef api object wrap_particle(th.Particle *p):
 	cdef Particle r = Particle.__new__(Particle)
 	r.p_this = p
 	return r
 
 def get_passed_lifetime(Particle particle):
-	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
-	p[0] = dparticles.getPassedLifetime(particle.p_this[0])
+	cdef sf.Time* p = new sf.Time()
+	p[0] = th.getPassedLifetime(particle.p_this[0])
 	return wrap_time(p)
 
 def get_total_lifetime(Particle particle):
-	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
-	p[0] = dparticles.getTotalLifetime(particle.p_this[0])
+	cdef sf.Time* p = new sf.Time()
+	p[0] = th.getTotalLifetime(particle.p_this[0])
 	return wrap_time(p)
 
 def get_remaining_lifetime(Particle particle):
-	cdef pysfml.dsystem.Time* p = new pysfml.dsystem.Time()
-	p[0] = dparticles.getRemainingLifetime(particle.p_this[0])
+	cdef sf.Time* p = new sf.Time()
+	p[0] = th.getRemainingLifetime(particle.p_this[0])
 	return wrap_time(p)
 
 def get_passed_ratio(Particle particle):
-	return dparticles.getPassedRatio(particle.p_this[0])
+	return th.getPassedRatio(particle.p_this[0])
 
 def get_remaining_ratio(Particle particle):
-	return dparticles.getRemainingRatio(particle.p_this[0])
+	return th.getRemainingRatio(particle.p_this[0])
 
 
 cdef class Emitter:
-	cdef dparticles.emitter.Ptr p_emitter
+	cdef th.emitter.Ptr p_emitter
 
 	def __init__(self):
 		if self.__class__ == Emitter:
 			raise Exception("Emitter is abstract")
 
-		self.p_emitter = dparticles.derivableemitter.create(self)
+		self.p_emitter = th.derivableemitter.create(self)
 
 	def emit(self, EmitterAdder system, Time dt):
 		pass
 
 
 cdef class Affector:
-	cdef dparticles.affector.Ptr p_affector
+	cdef th.affector.Ptr p_affector
 
 	def __init__(self):
 		if self.__class__ == Affector:
 			raise Exception("Affector is abstract")
 
-		self.p_affector = dparticles.derivableaffector.create(self)
+		self.p_affector = th.derivableaffector.create(self)
 
 	def affect(self, Particle particle, Time dt):
 		pass
 
 cdef class ParticleSystem(Drawable):
-	cdef dparticles.ParticleSystem *p_this
+	cdef th.ParticleSystem *p_this
 
 	def __cinit__(self, Texture texture, rectangle=None):
 		texture.delete_this = False
 
 		if not rectangle:
-			self.p_this = new dparticles.ParticleSystem(dparticles.shared_ptr[pysfml.dgraphics.Texture](texture.p_this))
+			self.p_this = new th.ParticleSystem(th.shared_ptr[sf.Texture](texture.p_this))
 		else:
-			self.p_this = new dparticles.ParticleSystem(dparticles.shared_ptr[pysfml.dgraphics.Texture](texture.p_this), rectangle_to_intrect(rectangle))
+			self.p_this = new th.ParticleSystem(th.shared_ptr[sf.Texture](texture.p_this), to_intrect(rectangle))
 
 	def __dealloc__(self):
 		del self.p_this
 
 	def draw(self, RenderTarget target, RenderStates states):
-		target.p_rendertarget.draw((<pysfml.dgraphics.Drawable*>self.p_this)[0])
+		target.p_rendertarget.draw((<sf.Drawable*>self.p_this)[0])
 
 	def add_emitter(self, Emitter emitter, Time time_until_removal=None):
 		if not time_until_removal:
@@ -197,12 +188,12 @@ cdef class ParticleSystem(Drawable):
 
 
 cdef class EmitterAdder:
-	cdef dparticles.emitter.Adder *p_this
+	cdef th.emitter.Adder *p_this
 
 	def add_particle(self, Particle particle):
 		self.p_this.addParticle(particle.p_this[0])
 
-cdef api object wrap_emitteradder(dparticles.emitter.Adder *p):
+cdef api object wrap_emitteradder(th.emitter.Adder *p):
 	cdef EmitterAdder r = EmitterAdder.__new__(EmitterAdder)
 	r.p_this = p
 	return r
@@ -219,11 +210,11 @@ cdef Distribution getDistribution(distributionType distribution):
 		return distribution
 
 cdef class UniversalEmitter(Emitter):
-	cdef dparticles.universalemitter.Ptr p_this
+	cdef th.universalemitter.Ptr p_this
 
 	def __init__(self):
-		self.p_this = dparticles.universalemitter.create()
-		self.p_emitter = dparticles.castUniversalEmitter(self.p_this)
+		self.p_this = th.universalemitter.create()
+		self.p_emitter = th.castUniversalEmitter(self.p_this)
 
 	property emission_rate:
 		def __set__(self, float particles_per_second):
@@ -266,28 +257,28 @@ cdef class UniversalEmitter(Emitter):
 
 
 cdef class ForceAffector(Affector):
-	cdef shared_ptr[dparticles.ForceAffector] p_this
+	cdef shared_ptr[th.ForceAffector] p_this
 
 	def __init__(self, acceleration):
-		self.p_this = dparticles.forceaffector.create(vector2_to_vector2f(acceleration))
-		self.p_affector = dparticles.castForceAffector(self.p_this)
+		self.p_this = th.forceaffector.create(to_vector2f(acceleration))
+		self.p_affector = th.castForceAffector(self.p_this)
 
 	property acceleration:
 		def __get__(self):
-			cdef pysfml.dsystem.Vector2f p
+			cdef sf.Vector2f p
 			p = self.p_this.get().getAcceleration()
 			return Vector2(p.x, p.y)
 
 		def __set__(self, acceleration):
-			self.p_this.get().setAcceleration(vector2_to_vector2f(acceleration))
+			self.p_this.get().setAcceleration(to_vector2f(acceleration))
 
 
 cdef class TorqueAffector(Affector):
-	cdef shared_ptr[dparticles.TorqueAffector] p_this
+	cdef shared_ptr[th.TorqueAffector] p_this
 
 	def __init__(self, float angular_acceleration):
-		self.p_this = dparticles.torqueaffector.create(angular_acceleration)
-		self.p_affector = dparticles.castTorqueAffector(self.p_this)
+		self.p_this = th.torqueaffector.create(angular_acceleration)
+		self.p_affector = th.castTorqueAffector(self.p_this)
 
 	property angular_acceleration:
 		def __get__(self):
@@ -302,34 +293,34 @@ ctypedef fused AnimationFunction:
 	FadeAnimation
 
 cdef class AnimationAffector(Affector):
-	cdef shared_ptr[dparticles.AnimationAffector] p_this
+	cdef shared_ptr[th.AnimationAffector] p_this
 
-	@classmethod
-	def create(cls, AnimationFunction particle_animation):
-		cdef AnimationAffector r = AnimationAffector.__new__(AnimationAffector)
+	#@classmethod
+	#def create(cls, AnimationFunction particle_animation):
+		#cdef AnimationAffector r = AnimationAffector.__new__(AnimationAffector)
 
-		if AnimationFunction is ColorAnimation:
-			r.p_this = dparticles.animationaffector.create(<danimation.ColorAnimation>particle_animation.p_this[0])
-			r.p_affector = dparticles.castAnimationAffector(r.p_this)
-		elif AnimationFunction is FadeAnimation:
-			r.p_this = dparticles.animationaffector.create(<danimation.FadeAnimation>particle_animation.p_this[0])
-			r.p_affector = dparticles.castAnimationAffector(r.p_this)
+		#if AnimationFunction is ColorAnimation:
+			#r.p_this = th.animationaffector.create(<th.ColorAnimation>particle_animation.p_this[0])
+			#r.p_affector = th.castAnimationAffector(r.p_this)
+		#elif AnimationFunction is FadeAnimation:
+			#r.p_this = th.animationaffector.create(<th.FadeAnimation>particle_animation.p_this[0])
+			#r.p_affector = th.castAnimationAffector(r.p_this)
 
-		return r
+		#return r
 
 
 cdef class ScaleAffector(Affector):
-	cdef shared_ptr[dparticles.ScaleAffector] p_this
+	cdef shared_ptr[th.ScaleAffector] p_this
 
 	def __init__(self, scale_factor):
-		self.p_this = dparticles.scaleaffector.create(vector2_to_vector2f(scale_factor))
-		self.p_affector = dparticles.castScaleAffector(self.p_this)
+		self.p_this = th.scaleaffector.create(to_vector2f(scale_factor))
+		self.p_affector = th.castScaleAffector(self.p_this)
 
 	property scale_factor:
 		def __get__(self):
-			cdef pysfml.dsystem.Vector2f p
+			cdef sf.Vector2f p
 			p = self.p_this.get().getScaleFactor()
 			return Vector2(p.x, p.y)
 
 		def __set__(self, scale_factor):
-			self.p_this.get().setScaleFactor(vector2_to_vector2f(scale_factor))
+			self.p_this.get().setScaleFactor(to_vector2f(scale_factor))

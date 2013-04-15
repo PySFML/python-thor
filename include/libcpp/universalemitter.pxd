@@ -9,10 +9,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from pysfml.dsystem cimport Vector2f
-from dparticles cimport shared_ptr
-from dparticles cimport ScaleAffector
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport UniversalEmitter
 
-cdef extern from "Thor/Particles.hpp" namespace "thor::ScaleAffector":
-	ctypedef shared_ptr[ScaleAffector] Ptr
-	Ptr create(Vector2f)
+cdef extern from "Thor/Particles.hpp" namespace "thor::UniversalEmitter":
+	ctypedef shared_ptr[UniversalEmitter] Ptr
+	Ptr create()

@@ -9,11 +9,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from danimation cimport FrameAnimation, ColorAnimation, FadeAnimation
-from dparticles cimport shared_ptr
-from dparticles cimport AnimationAffector
+from libcpp.sfml cimport Vector2f
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport ScaleAffector
 
-cdef extern from "Thor/Particles.hpp" namespace "thor::AnimationAffector":
-	ctypedef shared_ptr[AnimationAffector] Ptr
-	Ptr create(ColorAnimation)
-	Ptr create(FadeAnimation)
+cdef extern from "Thor/Particles.hpp" namespace "thor::ScaleAffector":
+	ctypedef shared_ptr[ScaleAffector] Ptr
+	Ptr create(Vector2f)

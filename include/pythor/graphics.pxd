@@ -9,9 +9,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dparticles cimport shared_ptr
-from dparticles cimport TorqueAffector
+cimport libcpp.thor as th
 
-cdef extern from "Thor/Particles.hpp" namespace "thor::TorqueAffector":
-	ctypedef shared_ptr[TorqueAffector] Ptr
-	Ptr create(float)
+cdef extern from "graphics.h":
+	cdef class thor.graphics.ColorGradient [object PyColorGradientObject]:
+		cdef th.ColorGradient *p_this

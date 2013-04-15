@@ -9,13 +9,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cimport devents
+cimport libcpp.thor as th
 
 cdef public class Connection[type PyConnectionType, object PyConnectionObject]:
-	cdef devents.Connection *p_this
+	cdef th.Connection *p_this
 
 	def __init__(self):
-		self.p_this = new devents.Connection()
+		self.p_this = new th.Connection()
 
 	def __dealloc__(self):
 		del self.p_this
@@ -29,7 +29,7 @@ cdef public class Connection[type PyConnectionType, object PyConnectionObject]:
 	def disconnect(self):
 		self.p_this.disconnect()
 
-cdef Connection wrap_connection(devents.Connection *p):
+cdef Connection wrap_connection(th.Connection *p):
 	cdef Connection r = Connection.__new__(Connection)
 	r.p_this = p
 	return r

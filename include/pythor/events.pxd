@@ -9,12 +9,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dparticles cimport shared_ptr
-from dparticles cimport Emitter
-from dparticles cimport Particle
+cimport libcpp.thor as th
 
-cdef extern from "Thor/Particles.hpp" namespace "thor::Emitter":
-	ctypedef shared_ptr[Emitter] Ptr
+cdef extern from "events.h":
+	cdef class thor.events.Connection [object PyConnectionObject]:
+		cdef th.Connection *p_this
 
-	cdef cppclass Adder:
-		void addParticle(Particle&)
+cdef inline Connection wrap_connection(th.Connection *p):
+	cdef Connection r = Connection.__new__(Connection)
+	r.p_this = p
+	return r

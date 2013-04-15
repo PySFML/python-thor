@@ -9,10 +9,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cdef extern from "Thor/Events.hpp" namespace "thor":
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport TorqueAffector
 
-	cdef cppclass Connection:
-		Connection()
-		bint isConnected()
-		void invalidate()
-		void disconnect()
+cdef extern from "Thor/Particles.hpp" namespace "thor::TorqueAffector":
+	ctypedef shared_ptr[TorqueAffector] Ptr
+	Ptr create(float)

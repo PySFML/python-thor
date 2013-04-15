@@ -8,6 +8,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-cimport dresources
+
+cimport libcpp.thor as th
 
 print("hello resources!")

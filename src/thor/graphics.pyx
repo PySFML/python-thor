@@ -9,9 +9,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cimport pysfml.dsystem
-cimport pysfml.dgraphics
-cimport dgraphics
+cimport libcpp.sfml as sf
+cimport libcpp.thor as th
 
 from pysfml.system cimport Vector2
 from pysfml.graphics cimport Rectangle
@@ -19,25 +18,23 @@ from pysfml.graphics cimport Color, wrap_color
 from pysfml.graphics cimport Image
 from pysfml.graphics cimport TransformableDrawable
 from pysfml.graphics cimport RenderTarget, RenderStates
-
-cdef Rectangle floatrect_to_rectangle(pysfml.dsystem.FloatRect* floatrect):
-	return Rectangle((floatrect.left, floatrect.top), (floatrect.width, floatrect.height))
+from pysfml.graphics cimport floatrect_to_rectangle
 
 
 cdef class BigTexture:
-	cdef dgraphics.BigTexture *p_this
+	cdef th.BigTexture *p_this
 	cdef bint                  delete_this
 
 	def __cinit__(self):
-		self.p_this = new dgraphics.BigTexture()
+		self.p_this = new th.BigTexture()
 		self.delete_this = True
 
 	def __dealloc__(self):
 		if self.delete_this: del self.p_this
-		
+
 	@classmethod
 	def from_file(cls, filename):
-		cdef dgraphics.BigTexture *p = new dgraphics.BigTexture()
+		cdef th.BigTexture *p = new th.BigTexture()
 		cdef char* encoded_filename
 
 		encoded_filename_temporary = filename.encode('UTF-8')
@@ -53,7 +50,7 @@ cdef class BigTexture:
 
 	@classmethod
 	def from_memory(cls, bytes data):
-		cdef dgraphics.BigTexture *p = new dgraphics.BigTexture()
+		cdef th.BigTexture *p = new th.BigTexture()
 
 		if p.loadFromMemory(<char*>data, len(data)):
 			return wrap_bigtexture(p)
@@ -65,7 +62,7 @@ cdef class BigTexture:
 
 	@classmethod
 	def from_image(cls, Image image):
-		cdef dgraphics.BigTexture *p = new dgraphics.BigTexture()
+		cdef th.BigTexture *p = new th.BigTexture()
 
 		if p.loadFromImage(image.p_this[0]):
 			return wrap_bigtexture(p)
@@ -81,32 +78,32 @@ cdef class BigTexture:
 
 	def swap(self, BigTexture other):
 		self.p_this.swap(other.p_this[0])
-		
-cdef BigTexture wrap_bigtexture(dgraphics.BigTexture *p):
+
+cdef BigTexture wrap_bigtexture(th.BigTexture *p):
 	cdef BigTexture r = BigTexture.__new__(BigTexture)
 	r.p_this = p
 	return r
 
 
 cdef class BigSprite(TransformableDrawable):
-	cdef dgraphics.BigSprite *p_this
+	cdef th.BigSprite *p_this
 	cdef BigTexture           m_texture
 
 	def __cinit__(self, BigTexture texture=None):
 		if not texture:
-			self.p_this = new dgraphics.BigSprite()
+			self.p_this = new th.BigSprite()
 		else:
-			self.p_this = new dgraphics.BigSprite(texture.p_this[0])
+			self.p_this = new th.BigSprite(texture.p_this[0])
 			m_texture = texture
-			
-		self.p_drawable = <pysfml.dgraphics.Drawable*>self.p_this
-		self.p_transformable = <pysfml.dgraphics.Transformable*>self.p_this
+
+		self.p_drawable = <sf.Drawable*>self.p_this
+		self.p_transformable = <sf.Transformable*>self.p_this
 
 	def __dealloc__(self):
 		del self.p_this
 
 	def draw(self, RenderTarget target, RenderStates states):
-		target.p_rendertarget.draw((<pysfml.dgraphics.Drawable*>self.p_this)[0])
+		target.p_rendertarget.draw((<sf.Drawable*>self.p_this)[0])
 
 	property texture:
 		def __get__(self):
@@ -118,7 +115,7 @@ cdef class BigSprite(TransformableDrawable):
 
 	property color:
 		def __get__(self):
-			cdef dgraphics.Color* p = new dgraphics.Color()
+			cdef th.Color* p = new th.Color()
 			p[0] = self.p_this.getColor()
 			return wrap_color(p)
 
@@ -127,37 +124,37 @@ cdef class BigSprite(TransformableDrawable):
 
 	property local_bounds:
 		def __get__(self):
-			cdef pysfml.dsystem.FloatRect p = self.p_this.getLocalBounds()
+			cdef sf.FloatRect p = self.p_this.getLocalBounds()
 			return floatrect_to_rectangle(&p)
 
 	property global_bounds:
 		def __get__(self):
-			cdef pysfml.dsystem.FloatRect p = self.p_this.getGlobalBounds()
+			cdef sf.FloatRect p = self.p_this.getGlobalBounds()
 			return floatrect_to_rectangle(&p)
 
 cdef public class ColorGradient[type PyColorGradientType, object PyColorGradientObject]:
-	cdef dgraphics.ColorGradient *p_this
+	cdef th.ColorGradient *p_this
 
 	def __init__(self, Color color):
-		self.p_this = new dgraphics.ColorGradient(color.p_this[0])
+		self.p_this = new th.ColorGradient(color.p_this[0])
 
 	def __dealloc__(self):
 		del self.p_this
 
 	def get_color(self, float interpolation):
-		cdef pysfml.dgraphics.Color* p = new pysfml.dgraphics.Color()
+		cdef sf.Color* p = new sf.Color()
 		p[0] = self.p_this.getColor(interpolation)
 		return wrap_color(p)
 
-cdef api object wrap_colorgradient(dgraphics.ColorGradient *p):
+cdef api object wrap_colorgradient(th.ColorGradient *p):
 	cdef ColorGradient r = ColorGradient.__new__(ColorGradient)
 	r.p_this = p
 	return r
 
 def blend_colors(Color first_color, Color second_color, float interpolation):
-	cdef dgraphics.Color* p = new dgraphics.Color()
-	p[0] = dgraphics.blendColors(first_color.p_this[0], second_color.p_this[0], interpolation)
+	cdef th.Color* p = new th.Color()
+	p[0] = th.blendColors(first_color.p_this[0], second_color.p_this[0], interpolation)
 	return wrap_color(p)
 
 def create_gradient(object mylist):
-	return dgraphics.createGradientFromList(mylist)
+	return th.createGradientFromList(mylist)

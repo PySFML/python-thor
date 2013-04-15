@@ -9,7 +9,3 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dparticles cimport emitter
-
-cdef extern from "particles/DerivableEmitter.hpp" namespace "DerivableEmitter":
-	emitter.Ptr create(object)

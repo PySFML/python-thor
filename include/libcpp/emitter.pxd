@@ -9,11 +9,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dparticles cimport affector
-#from dparticles cimport shared_ptr
-#from dparticles cimport DerivableAffector
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport Emitter
+from libcpp.thor cimport Particle
 
-cdef extern from "particles/DerivableAffector.hpp" namespace "DerivableAffector":
-	#ctypedef shared_ptr[DerivableAffector] Ptr
-	affector.Ptr create(object)
-	#shared_ptr[DerivableAffector] create(object)
+cdef extern from "Thor/Particles.hpp" namespace "thor::Emitter":
+	ctypedef shared_ptr[Emitter] Ptr
+
+	cdef cppclass Adder:
+		void addParticle(Particle&)

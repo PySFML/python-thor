@@ -9,8 +9,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cimport dmath
+cimport libcpp.thor as th
 
-cdef extern from "math/math.h":
-	cdef class thor.math.Distribution [object PyDistributionObject]:
-		cdef dmath.DistributionAPI *p_this
+cdef extern from "pythor/math.h":
+    cdef class thor.math.Distribution [object PyDistributionObject]:
+        cdef th.DistributionAPI *p_this

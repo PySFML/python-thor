@@ -9,9 +9,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dparticles cimport shared_ptr
-from dparticles cimport UniversalEmitter
+from libcpp.thor cimport FrameAnimation, ColorAnimation, FadeAnimation
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport AnimationAffector
 
-cdef extern from "Thor/Particles.hpp" namespace "thor::UniversalEmitter":
-	ctypedef shared_ptr[UniversalEmitter] Ptr
-	Ptr create()
+cdef extern from "Thor/Particles.hpp" namespace "thor::AnimationAffector":
+	ctypedef shared_ptr[AnimationAffector] Ptr
+	Ptr create(ColorAnimation)
+	Ptr create(FadeAnimation)

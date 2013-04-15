@@ -9,8 +9,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-cimport dgraphics
+from libcpp.thor cimport emitter
 
-cdef extern from "graphics.h":
-	cdef class thor.graphics.ColorGradient [object PyColorGradientObject]:
-		cdef dgraphics.ColorGradient *p_this
+cdef extern from "particles/DerivableEmitter.hpp" namespace "DerivableEmitter":
+	emitter.Ptr create(object)

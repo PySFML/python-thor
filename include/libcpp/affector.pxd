@@ -9,8 +9,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from dparticles cimport shared_ptr
-from dparticles cimport Affector
+from libcpp.thor cimport shared_ptr
+from libcpp.thor cimport Affector
 
 cdef extern from "Thor/Particles.hpp" namespace "thor::Affector":
 	ctypedef shared_ptr[Affector] Ptr

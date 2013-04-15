@@ -9,21 +9,19 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-
-from pysfml cimport dsystem
-cimport dtime, devents
+cimport libcpp.sfml as sf
+cimport libcpp.thor as th
 
 from pysfml.system cimport Time, wrap_time
+from pythor.events cimport wrap_connection
 
-from events cimport wrap_connection
-
-dtime.PyEval_InitThreads()
+th.PyEval_InitThreads()
 
 cdef class Timer:
-	cdef dtime.Timer *p_timer
+	cdef th.Timer *p_timer
 
 	def __init__(self):
-		self.p_timer = new dtime.Timer()
+		self.p_timer = new th.Timer()
 
 	def __del__(self):
 		del self.p_timer
@@ -50,17 +48,17 @@ cdef class Timer:
 
 	property remaining_time:
 		def __get__(self):
-			cdef dsystem.Time* p = new dsystem.Time()
+			cdef sf.Time* p = new sf.Time()
 			p[0] = self.p_timer.getRemainingTime()
 			return wrap_time(p)
 
 
 cdef class CallbackTimer(Timer):
-	cdef dtime.CallbackTimer *p_this
+	cdef th.CallbackTimer *p_this
 
 	def __init__(self):
-		self.p_this = new dtime.CallbackTimer()
-		self.p_timer = <dtime.Timer*>self.p_this
+		self.p_this = new th.CallbackTimer()
+		self.p_timer = <th.Timer*>self.p_this
 
 	def __del__(self):
 		del self.p_this
@@ -69,8 +67,8 @@ cdef class CallbackTimer(Timer):
 		with nogil: self.p_this.update()
 
 	def connect(self, function):
-		cdef devents.Connection *p = new devents.Connection()
-		p[0] = dtime.CallbackTimer_connect(self.p_this, function)
+		cdef th.Connection *p = new th.Connection()
+		p[0] = th.CallbackTimer_connect(self.p_this, function)
 		return wrap_connection(p)
 
 	def clear_connections(self):
@@ -78,10 +76,10 @@ cdef class CallbackTimer(Timer):
 
 
 cdef class StopWatch:
-	cdef dtime.StopWatch *p_this
+	cdef th.StopWatch *p_this
 
 	def __cinit__(self):
-		self.p_this = new dtime.StopWatch()
+		self.p_this = new th.StopWatch()
 
 	def __dealloc__(self):
 		del self.p_this
@@ -104,6 +102,6 @@ cdef class StopWatch:
 
 	property elapsed_time:
 		def __get__(self):
-			cdef dsystem.Time* p = new dsystem.Time()
+			cdef sf.Time* p = new sf.Time()
 			p[0] = self.p_this.getElapsedTime()
 			return wrap_time(p)

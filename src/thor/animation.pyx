@@ -8,50 +8,47 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-cimport danimation
-cimport pysfml.dsystem
-cimport pysfml.dgraphics
 
 from libcpp.string cimport string
+
+cimport libcpp.sfml as sf
+cimport libcpp.thor as th
 
 from pysfml.system cimport Time
 from pysfml.graphics cimport Sprite
 
-from graphics cimport ColorGradient
-
-cdef pysfml.dsystem.IntRect rectangle_to_intrect(rectangle):
-	l, t, w, h = rectangle
-	return pysfml.dsystem.IntRect(l, t, w, h)
+from pysfml.graphics cimport to_intrect
+from pythor.graphics cimport ColorGradient
 
 
 cdef public class FrameAnimation[type PyFrameAnimationType, object PyFrameAnimationObject]:
-	cdef danimation.FrameAnimation *p_this
+	cdef th.FrameAnimation *p_this
 
 	def __cinit__(self):
-		self.p_this = new danimation.FrameAnimation()
+		self.p_this = new th.FrameAnimation()
 
 	def __dealloc__(self):
 		del self.p_this
 
 	def add_frame(self, float relative_duration, subrect):
-		self.p_this.addFrame(relative_duration, rectangle_to_intrect(subrect))
+		self.p_this.addFrame(relative_duration, to_intrect(subrect))
 
 
 cdef public class ColorAnimation[type PyColorAnimationType, object PyColorAnimationObject]:
-	cdef danimation.ColorAnimation *p_this
+	cdef th.ColorAnimation *p_this
 
 	def __cinit__(self, ColorGradient gradient):
-		self.p_this = new danimation.ColorAnimation(gradient.p_this[0])
+		self.p_this = new th.ColorAnimation(gradient.p_this[0])
 
 	def __dealloc__(self):
 		del self.p_this
 
 
 cdef public class FadeAnimation[type PyFadeAnimationType, object PyFadeAnimationObject]:
-	cdef danimation.FadeAnimation *p_this
+	cdef th.FadeAnimation *p_this
 
 	def __cinit__(self, float in_ratio, float out_ratio):
-		self.p_this = new danimation.FadeAnimation(in_ratio, out_ratio)
+		self.p_this = new th.FadeAnimation(in_ratio, out_ratio)
 
 	def __dealloc__(self):
 		del self.p_this
@@ -62,21 +59,21 @@ ctypedef fused AnimationFunction:
 	FadeAnimation
 
 cdef class Animator:
-	cdef danimation.Animator[pysfml.dgraphics.Sprite, string] *p_this
+	cdef th.Animator[sf.Sprite, string] *p_this
 
 	def __cinit__(self, *args, **kwargs):
-		self.p_this = new danimation.Animator[pysfml.dgraphics.Sprite, string]()
+		self.p_this = new th.Animator[sf.Sprite, string]()
 
 	def __dealloc__(self):
 		del self.p_this
 
 	def add_animation(self, string id, AnimationFunction animation, Time duration):
 		if AnimationFunction is FrameAnimation:
-			self.p_this.addAnimation(<string>id, (<danimation.FrameAnimation*>animation.p_this)[0], (<pysfml.dgraphics.Time*>duration.p_this)[0])
+			self.p_this.addAnimation(<string>id, (<th.FrameAnimation*>animation.p_this)[0], (<sf.Time*>duration.p_this)[0])
 		elif AnimationFunction is ColorAnimation:
-			self.p_this.addAnimation(<string>id, (<danimation.ColorAnimation*>animation.p_this)[0], (<pysfml.dgraphics.Time*>duration.p_this)[0])
+			self.p_this.addAnimation(<string>id, (<th.ColorAnimation*>animation.p_this)[0], (<sf.Time*>duration.p_this)[0])
 		elif AnimationFunction is FadeAnimation:
-			self.p_this.addAnimation(<string>id, (<danimation.FadeAnimation*>animation.p_this)[0], (<pysfml.dgraphics.Time*>duration.p_this)[0])
+			self.p_this.addAnimation(<string>id, (<th.FadeAnimation*>animation.p_this)[0], (<sf.Time*>duration.p_this)[0])
 
 	def play_animation(self, string id, bint loop=False):
 		self.p_this.playAnimation(id, loop)
