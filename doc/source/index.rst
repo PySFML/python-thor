@@ -1,14 +1,56 @@
-Python bindings for THOR
+Python bindings for Thor
 ========================
-This is version 0.9alpha of the Python bindings for Thor, based on the latest pySFML
-changes and is made available under the terms of the LGPLv3 license.
+This is version 0.9alpha of the Python bindings for `Thor`_, based on
+the latest `pySFML`_ version (*latest_sfml* branch) and is made
+available under the terms of the `LGPLv3`_ license.
 
-This is a work-in-progress.
+This is a work-in-progress and that's why you'll find missing features
+and the following sections may be incomplete.
 
 So far, no documentation is provided, refer to examples.
 
+These bindings were created in large part by Jonathan De Wachter, with
+significant contributions from Edwin Marshall.
+
+Table of Contents
+=================
+
+.. hlist::
+   :columns: 2
+
+
+   * .. glossary::
+
+      :doc:`gettingstarted`
+         A gentle introduction to these bindings, covering some basic
+         principles.
+
+   * .. glossary::
+
+      :doc:`download`
+         Instructions on where and how to install these bindings for various
+         platforms. Includes information on how to compile them from source.
+
+   * .. glossary::
+
+      :doc:`examples`
+         Practical examples demonstrating how various parts of this binding can
+         work together with each other as well as other APIs.
+
+   * .. glossary::
+
+      :doc:`tutorials`
+         Tutorials focusing on the various core principles integral to
+         understanding how Thor works.
+
+   * .. glossary::
+
+      :doc:`api/index`
+         Complete library reference organized by each of the binding's nine
+         core modules.
+
 Progress
---------
+========
 Module Implementation:
 
 - Time, particle, animation, graphics and shapes modules **are implemented**.
@@ -20,18 +62,11 @@ incomplete (quick implementation):
 
 - So far, Animator support animation sf.Sprite only
 - Function to add callbacks should support *args
-- ...
+- ..... _LGPLv3: htp://www.gnu.org/copyleft/lgpl.html
 
 See **todolist** section for more details.
 
-Contents
---------
-.. toctree::
-   :maxdepth: 1
 
-   introduction
-   todolist
-   gettingstarted
-   downloads
-   examples
-   api/index
+.. _Thor: http://www.bromeon.ch/libraries/thor/
+.. _pySFML: http://www.python-sfml/1.3
+.. _LGPLv3: http://www.gnu.org/copyleft/lgpl.html
