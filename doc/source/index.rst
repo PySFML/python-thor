@@ -1,16 +1,17 @@
 Python bindings for Thor
 ========================
-This is version 0.9alpha of the Python bindings for `Thor`_, based on
+This is version **0.9alpha** of the Python bindings for `Thor`_, based on
 the latest `pySFML`_ version (*latest_sfml* branch) and is made
 available under the terms of the `LGPLv3`_ license.
 
-This is a work-in-progress and that's why you'll find missing features
-and the following sections may be incomplete.
+This is a **work-in-progress** and that's why you'll find missing features
+and the following sections may be incomplete. See
+:doc:`TODO list </todolist>` section for more details.
 
-So far, no documentation is provided, refer to examples.
+So far, no documentation is provided, please refer to examples.
 
-These bindings were created in large part by Jonathan De Wachter, with
-significant contributions from Edwin Marshall.
+These bindings were created in large part by **Jonathan De Wachter**, with
+significant contributions from **Edwin Marshall**.
 
 Table of Contents
 =================
@@ -51,7 +52,7 @@ Table of Contents
 
 Progress
 ========
-Module Implementation:
+Module Implementation States:
 
 - Time, particle, animation, graphics and shapes modules **are implemented**.
 - Vector and math modules are **partially** implemented
@@ -62,9 +63,6 @@ incomplete (quick implementation):
 
 - So far, Animator support animation sf.Sprite only
 - Function to add callbacks should support *args
-- ..... _LGPLv3: htp://www.gnu.org/copyleft/lgpl.html
-
-See **todolist** section for more details.
 
 
 .. _Thor: http://www.bromeon.ch/libraries/thor/
