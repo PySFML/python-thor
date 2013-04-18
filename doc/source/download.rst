@@ -1,5 +1,17 @@
 Downloads
 =========
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ultrices nisi arcu, at rutrum erat. Vivamus dapibus, metus ut fringilla pharetra, nisl nisi pulvinar nisl, lobortis pharetra purus sem at massa. Duis eu condimentum elit. In hac habitasse platea dictumst. Etiam enim lacus, sagittis sed eleifend et, blandit vel erat. Vivamus tempus consectetur lacus, vel sodales risus malesuada a. Donec lorem nibh, dignissim ac placerat sed, pharetra vel ante. Aliquam malesuada libero non neque laoreet dictum. Vestibulum sit amet mi metus. Praesent ullamcorper, sapien sed facilisis eleifend, ipsum justo pellentesque nibh, a commodo nulla lorem sit amet ligula. Nullam eget risus vel velit accumsan mattis. Ut iaculis, elit at elementum vulputate, urna ligula auctor nisl, quis tristique metus velit vitae lorem. Fusce ut tortor purus.
+So far, no packages or installers are provided so you'll have to
+compile it by yourself.
 
-Vestibulum neque orci, convallis sit amet interdum eu, vulputate tincidunt leo. Sed ipsum sem, eleifend et mollis at, tincidunt id elit. Mauris dui ante, volutpat ac ultrices posuere, convallis in enim. Ut elit lacus, fermentum in pellentesque vitae, varius dignissim metus. Ut eu egestas ante. Nullam malesuada rutrum turpis eu lobortis. Proin lorem odio, auctor eget lacinia id, feugiat id mauris. Sed arcu orci, placerat at luctus sed, laoreet eget mauris. Nulla condimentum dolor ac neque mattis vitae ultrices diam faucibus. Nulla faucibus ante id dolor tincidunt luctus. 
+These bindings need Cython 0.18 to be compiled and a simple ::
+
+    python setup.py install
+
+should do the work if pySFML is properly installed.
+
+.. warning::
+
+	The above instructions are for Unix systems if you want to compile on
+	Windows you'll have to figure out by yourself. It shouldn't be that
+	complicated, minor changes to setup.py and a good understanding on how
+	to distribute Python extensions using Cython is enough.
