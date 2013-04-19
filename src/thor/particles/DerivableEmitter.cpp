@@ -12,7 +12,7 @@
 
 #include "particles/DerivableEmitter.hpp"
 #include <pysfml/system_api.h>
-#include "particles_api.h"
+#include "pythor/particles_api.h"
 
 struct D {
     void operator()(DerivableEmitter* emitter) const {

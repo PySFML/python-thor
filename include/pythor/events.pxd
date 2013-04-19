@@ -11,7 +11,7 @@
 
 cimport libcpp.thor as th
 
-cdef extern from "events.h":
+cdef extern from "pythor/events.h":
 	cdef class thor.events.Connection [object PyConnectionObject]:
 		cdef th.Connection *p_this
 

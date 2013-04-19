@@ -9,13 +9,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
 #include "DistributionAPI.hpp"
-
-#include <pysfml/system.h>
-#include <pysfml/system_api.h>
-#include <pysfml/graphics.h>
-#include <pysfml/graphics_api.h>
 
 DistributionObjectFunctor::DistributionObjectFunctor(PyObject* object) :
 m_object (object)

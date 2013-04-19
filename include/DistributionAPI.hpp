@@ -14,10 +14,17 @@
 #define PYTHOR_MATH_DISTRIBUTION_HPP
 
 #include "Python.h"
+
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
+
+#include <pysfml/system_api.h>
+#include <pysfml/system.h>
+
 #include <Thor/Math.hpp>
 
+#include <pysfml/graphics_api.h>
+#include <pysfml/graphics.h>
 
 class DistributionAPI: public thor::Distribution<PyObject*>
 {

@@ -11,6 +11,6 @@
 
 cimport libcpp.thor as th
 
-cdef extern from "graphics.h":
+cdef extern from "pythor/graphics.h":
 	cdef class thor.graphics.ColorGradient [object PyColorGradientObject]:
 		cdef th.ColorGradient *p_this

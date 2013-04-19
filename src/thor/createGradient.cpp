@@ -13,10 +13,10 @@
 #include "createGradient.hpp"
 #include "Thor/Graphics.hpp"
 #include <SFML/Graphics.hpp>
-#include "pysfml/graphics.h"
-#include "graphics.h"
 #include "pysfml/graphics_api.h"
-#include "graphics_api.h"
+#include "pysfml/graphics.h"
+#include "pythor/graphics_api.h"
+#include "pythor/graphics.h"
 
 PyObject* createGradientFromList(PyObject* list)
 {
