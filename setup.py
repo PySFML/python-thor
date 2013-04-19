@@ -9,133 +9,168 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os, platform
+import shutil
+from subprocess import call
+from distutils.core import setup, Extension
 
-from distutils.core import setup
-#from distutils.extension import Extension
-from Cython.Distutils import Extension
+# check if cython is installed somewhere
+try:
+	raise ImportError
+	from Cython.Distutils import build_ext as _build_ext
+	CYTHON_AVAILABLE = True
+except ImportError:
+	# on unix platforms, check if cython isn't installed in another
+	# python version, then compile manually
+	if platform.system() == 'Linux':
+		call('cython --cplus src/thor/graphics.pyx -Iinclude --fast-fail', shell=True)
+		call('mv src/thor/graphics.h include/pythor', shell=True)
+		call('mv src/thor/graphics_api.h include/pythor', shell=True)
+		call('cython --cplus src/thor/events.pyx -Iinclude --fast-fail', shell=True)
+		call('mv src/thor/events.h include/pythor', shell=True)
+		call('cython --cplus src/thor/resources.pyx -Iinclude --fast-fail', shell=True)
+		call('cython --cplus src/thor/shapes.pyx -Iinclude --fast-fail', shell=True)
+		call('cython --cplus src/thor/math.pyx -Iinclude --fast-fail', shell=True)
+		call('mv src/thor/math.h include/pythor', shell=True)
+		call('cython --cplus src/thor/time.pyx -Iinclude --fast-fail', shell=True)
+		call('cython --cplus src/thor/animation.pyx -Iinclude --fast-fail', shell=True)
+		call('mv src/thor/animation.h include/pythor', shell=True)
+		call('cython --cplus src/thor/particles.pyx -Iinclude --fast-fail', shell=True)
+		call('mv src/thor/particles_api.h include/pythor', shell=True)
+		call('cython --cplus src/thor/vectors.pyx -Iinclude --fast-fail', shell=True)
+
+	from distutils.command import build_ext as _build_ext
+	CYTHON_AVAILABLE = False
 
 # check if cython is needed (if c++ files are generated or not)
-NEED_CYTHON = not all(map(os.path.exists, [
-    'src/thor/animation.cpp',
-    'src/thor/events.cpp',
-    'src/thor/graphics.cpp',
-    'src/thor/math.cpp',
-    'src/thor/particles.cpp',
-    'src/thor/resources.cpp',
-    'src/thor/shapes.cpp',
-    'src/thor/time.cpp',
-    'src/thor/vectors.cpp']))
+sources = dict(
+	animation = 'src/thor/animation.cpp',
+	events = 'src/thor/events.cpp',
+	resources = 'src/thor/resources.cpp',
+	shapes = 'src/thor/shapes.cpp',
+	math = 'src/thor/math.cpp',
+	time = 'src/thor/time.cpp',
+	graphics = 'src/thor/graphics.cpp',
+	particles = 'src/thor/particles.cpp',
+	vectors = 'src/thor/vectors.cpp')
 
-try:
-    USE_CYTHON = NEED_CYTHON or bool(int(os.environ.get('USE_CYTHON', 0)))
-except ValueError:
-    USE_CYTHON = NEED_CYTHON or bool(os.environ.get('USE_CYTHON'))
+NEED_CYTHON = not all(map(os.path.exists, sources.values()))
 
-if USE_CYTHON:
-    try:
-        from Cython.Distutils import build_ext
-        raise ImportError
+if NEED_CYTHON and not CYTHON_AVAILABLE:
+	print("Please install cython and try again. Or use an official release with pre-generated source")
+	raise SystemExit(1)
 
-    except ImportError:
-        from subprocess import call
-        try:
-            if platform.system() != 'Windows':
-                call(["cython", "--cplus", "src/thor/animation.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/events.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/graphics.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/math.pyx", "-Iinclude", "--fast-fail"])
-                #call(["cython", "--cplus", "src/thor/math/distributions.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/particles.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/resources.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/shapes.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/time.pyx", "-Iinclude", "--fast-fail"])
-                call(["cython", "--cplus", "src/thor/vectors.pyx", "-Iinclude", "--fast-fail"])
-                USE_CYTHON = False
-        except OSError:
-            print("Please install the correct version of cython and run again.")
-            sys.exit(1)
+if CYTHON_AVAILABLE:
+	class build_ext(_build_ext):
+		""" Updated version of cython build_ext command to move
+		the generated API headers to include/pythor directory
+		"""
 
-# define the include directory
-if platform.system() == 'Windows':
-    sfml_include = sys.prefix + "\\include\\pysfml"
-else:
-    major, minor, _, _ , _ = sys.version_info
-    sfml_include = sys.prefix + "/lib/python{0}.{1}".format(major, minor)
-    sfml_include2 = sys.prefix + "/lib/python{0}.{1}/pysfml".format(major, minor)
+		def cython_sources(self, sources, extension):
+			ret = _build_ext.cython_sources(self, sources, extension)
 
-if USE_CYTHON:
-    file_extension = "pyx"
-else:
-    file_extension = "cpp"
+			# should result the module name; e.g, graphics[.pyx]
+			module = os.path.basename(sources[0])[:-4]
 
-modules = ['animation', 'events', 'resources', 'shapes']
-libraries = ['sfml-system', 'sfml-window', 'sfml-graphics', 'sfml-audio', 'sfml-network']
+			# move its headers (foo.h and foo_api.h) to include/pysfml
+			destination = "include/pythor"
 
-if USE_CYTHON:
-    file_extension = ".pyx"
-else:
-    file_extension = ".cpp"
+			source = "src/thor/{0}.h".format(module)
+			if os.path.isfile(source):
+				try:
+					shutil.move(source, destination)
+				except shutil.Error:
+					pass
 
-extension = lambda name: Extension(
+			source = "src/thor/{0}_api.h".format(module)
+			if os.path.isfile(source):
+				try:
+					shutil.move(source, destination)
+				except shutil.Error:
+					pass
+
+			return ret
+
+sources = dict(
+	animation = 'src/thor/animation.pyx',
+	events = 'src/thor/events.pyx',
+	resources = 'src/thor/resources.pyx',
+	shapes = 'src/thor/shapes.pyx',
+	math = 'src/thor/math.pyx',
+	time = 'src/thor/time.pyx',
+	graphics = 'src/thor/graphics.pyx',
+	particles = 'src/thor/particles.pyx',
+	vectors = 'src/thor/vectors.pyx')
+
+if not CYTHON_AVAILABLE:
+	sources = {k: v.replace('pyx', 'cpp') for k, v in sources.items()}
+
+libs = ['sfml-system',
+		'sfml-window',
+		'sfml-graphics',
+		'sfml-audio',
+		'sfml-network',
+		'thor']
+
+extension = lambda name, files: Extension(
     'thor.' + name,
-    sources=["src/thor/" + name + file_extension],
-    include_dirs=['include', sfml_include, sfml_include2],
-    language='c++',
-    extra_compile_args = ['--std=c++0x'],
-    libraries=libraries+["thor"])
-
-#modules.remove("math")
-extensions = [extension(module) for module in modules]
-
-math_ext = Extension(
-    'thor.' + 'math',
-    sources=["src/thor/" + 'math' + file_extension, 'src/thor/DistributionAPI.cpp'],
-    include_dirs=['include', sfml_include, sfml_include2],
-    language='c++',
-    extra_compile_args = ['--std=c++0x'],
-    libraries=libraries+["thor"])
-
-extensions.append(math_ext)
-
-time_ext = Extension(
-    'thor.' + 'time',
-    sources=["src/thor/" + 'time' + file_extension, 'src/thor/listeners.cpp'],
-    include_dirs=['include', sfml_include, sfml_include2],
-    language='c++',
-    extra_compile_args = ['--std=c++0x'],
-    libraries=libraries+["thor"])
-
-extensions.append(time_ext)
-
-graphics_ext = Extension(
-    'thor.' + 'graphics',
-    sources=["src/thor/" + 'graphics' + file_extension, 'src/thor/createGradient.cpp'],
-    include_dirs=['include', sfml_include, sfml_include2],
+    sources=files,
+    include_dirs=['include'],
     language='c++',
     extra_compile_args = ['--std=c++0x', '-fpermissive'],
-    libraries=libraries+["thor"])
+    libraries=libs)
 
-extensions.append(graphics_ext)
+animation = extension(
+	'animation',
+	[sources['animation']])
 
-particles_ext = Extension(
-    'thor.' + 'particles',
-    sources=["src/thor/" + 'particles' + file_extension, 'src/thor/particles/DerivableAffector.cpp', 'src/thor/particles/DerivableEmitter.cpp', 'src/thor/particles/utilities.cpp'],
-    include_dirs=['include', 'src/thor', sfml_include, sfml_include2],
-    language='c++',
-    extra_compile_args = ['--std=c++0x'],
-    libraries=libraries+["thor"])
+events = extension(
+	'events',
+	[sources['events']])
 
-extensions.append(particles_ext)
+resources = extension(
+	'resources',
+	[sources['resources']])
 
-vectors_ext = Extension(
-    'thor.' + 'vectors',
-    sources=["src/thor/" + 'vectors' + file_extension, 'src/thor/vectors/PolarVector2Object.cpp'],
-    include_dirs=['include', sfml_include, sfml_include2],
-    language='c++',
-    extra_compile_args = ['--std=c++0x'],
-    libraries=libraries+["thor"])
+shapes = extension(
+	'shapes',
+	[sources['shapes']])
 
-extensions.append(vectors_ext)
+math = extension(
+	'math',
+	[sources['math'], 'src/thor/DistributionAPI.cpp'])
+
+time = extension(
+	'time',
+	[sources['time'], 'src/thor/listeners.cpp'])
+
+graphics = extension(
+	'graphics',
+	[sources['graphics'], 'src/thor/createGradient.cpp'])
+
+particles_files = list()
+particles_files.append(sources['particles'])
+particles_files.append('src/thor/particles/DerivableAffector.cpp')
+particles_files.append('src/thor/particles/DerivableEmitter.cpp')
+particles_files.append('src/thor/particles/utilities.cpp')
+
+particles = extension(
+	'particles',
+	particles_files)
+
+vectors = extension(
+	'vectors',
+	[sources['vectors'], 'src/thor/vectors/PolarVector2Object.cpp'])
+
+extensions = [graphics,
+				events,
+				resources,
+				shapes,
+				math,
+				time,
+				animation,
+				particles,
+				vectors]
+
 
 with open('README.rst', 'r') as f:
     long_description = f.read()
@@ -164,7 +199,7 @@ kwargs = dict(
                         'Topic :: Software Development :: Libraries :: Python Modules'],
             cmdclass=dict())
 
-if USE_CYTHON:
-    kwargs['cmdclass'].update({'build_ext': build_ext})
+if CYTHON_AVAILABLE:
+	kwargs['cmdclass'].update({'build_ext': build_ext})
 
 setup(**kwargs)
