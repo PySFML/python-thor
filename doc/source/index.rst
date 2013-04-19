@@ -62,9 +62,9 @@ Most of the Thor functionalities have been implemented but sometimes are
 incomplete (quick implementation):
 
 - So far, Animator support animation sf.Sprite only
-- Function to add callbacks should support *args
+- Function to add callbacks should support \*args
 
 
 .. _Thor: http://www.bromeon.ch/libraries/thor/
-.. _pySFML: http://www.python-sfml/1.3
+.. _pySFML: http://www.python-sfml.org/1.3
 .. _LGPLv3: http://www.gnu.org/copyleft/lgpl.html
