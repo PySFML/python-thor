@@ -1,7 +1,7 @@
 About
 =====
 This is version 1.0 of the binding for `Thor <http://www.bromeon.ch/libraries/thor/index.html>`_ 
-released under the `LGPLv3 <http://www.gnu.org/copyleft/lgpl.html>`_ license.
+released under the `zlib/libpng <http://opensource.org/licenses/Zlib>`_ license.
 
 Python bindings really are the perfect way to sketch software using SFML.
 
@@ -34,4 +34,3 @@ Contact Information
 Feel free to email us with any questions or concerns:
 
 * `Jonathan De Wachter <mailto:dewachter.jonathan@gmail.com>`_
-* `Edwin Marshall <mailto:emarshall85@gmail.com>`_

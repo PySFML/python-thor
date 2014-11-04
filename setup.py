@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-#
-# pyThor - Python bindings for Thor
-# Copyright 2013, Jonathan De Wachter <dewachter.jonathan@gmail.com>
-#
-# This software is released under the LGPLv3 license.
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 import sys, os, platform
 import shutil
 from subprocess import call
@@ -183,13 +173,12 @@ kwargs = dict(
             version='1.0.0',
             description='Python bindings for Thor',
             long_description=long_description,
-            author='Jonathan de Wachter, Edwin Marshall',
-            author_email='dewachter.jonathan@gmail.com, emarshall85@gmail.com',
+            author='Jonathan de Wachter',
+            author_email='dewachter.jonathan@gmail.com',
             url='http://thor.python-sfml.org',
-            license='LGPLv3',
             classifiers=['Development Status :: 5 - Production/Stable',
                         'Intended Audience :: Developers',
-                        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
+                        'License :: OSI Approved :: zlib/libpng License',
                         'Operating System :: OS Independent',
                         'Programming Language :: Cython',
                         'Programming Language :: C++',
