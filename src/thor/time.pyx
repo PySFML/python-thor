@@ -21,99 +21,107 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #-------------------------------------------------------------------------------
 
-cimport libcpp.sfml as sf
-cimport libcpp.thor as th
+cimport sfml as sf
+cimport thor as th
 
 from pysfml.system cimport Time, wrap_time
-from pythor.events cimport wrap_connection
+from pythor.input cimport wrap_connection
 
-th.PyEval_InitThreads()
+cdef extern from "TimerFunctor.hpp" namespace "":
+    th.Connection CallbackTimer_connect(th.CallbackTimer*, object)
+
+__all__ = ['Timer', 'CallbackTimer', 'StopWatch']
 
 cdef class Timer:
-	cdef th.Timer *p_timer
+    cdef th.Timer *p_timer
 
-	def __init__(self):
-		self.p_timer = new th.Timer()
+    def __init__(self):
+        if self.p_timer == NULL:
+            self.p_timer = new th.Timer()
 
-	def __del__(self):
-		del self.p_timer
+    def __dealloc__(self):
+        if self.p_timer != NULL:
+            del self.p_timer
 
-	def start(self):
-		self.p_timer.start()
+    property remaining_time:
+        def __get__(self):
+            cdef sf.Time* p = new sf.Time()
+            p[0] = self.p_timer.getRemainingTime()
+            return wrap_time(p)
 
-	def stop(self):
-		self.p_timer.stop()
+    property running:
+        def __get__(self):
+            return self.p_timer.isRunning()
 
-	property running:
-		def __get__(self):
-			return self.p_timer.isRunning()
+    property expired:
+        def __get__(self):
+            return self.p_timer.isExpired()
 
-	property expired:
-		def __get__(self):
-			return self.p_timer.isExpired()
+    def start(self):
+        self.p_timer.start()
 
-	def reset(self, Time time_limit):
-		self.p_timer.reset(time_limit.p_this[0])
+    def stop(self):
+        self.p_timer.stop()
 
-	def restart(self, Time time_limit):
-		self.p_timer.restart(time_limit.p_this[0])
+    def reset(self, Time time_limit):
+        self.p_timer.reset(time_limit.p_this[0])
 
-	property remaining_time:
-		def __get__(self):
-			cdef sf.Time* p = new sf.Time()
-			p[0] = self.p_timer.getRemainingTime()
-			return wrap_time(p)
+    def restart(self, Time time_limit):
+        self.p_timer.restart(time_limit.p_this[0])
 
 
 cdef class CallbackTimer(Timer):
-	cdef th.CallbackTimer *p_this
+    cdef th.CallbackTimer *p_this
 
-	def __init__(self):
-		self.p_this = new th.CallbackTimer()
-		self.p_timer = <th.Timer*>self.p_this
+    def __init__(self):
+        if self.p_this == NULL:
+            self.p_this = new th.CallbackTimer()
+            self.p_timer = <th.Timer*>self.p_this
 
-	def __del__(self):
-		del self.p_this
+    def __dealloc__(self):
+        self.p_timer = NULL
+        if self.p_this != NULL:
+            del self.p_this
 
-	def update(self):
-		with nogil: self.p_this.update()
+    def update(self):
+        self.p_this.update()
 
-	def connect(self, function):
-		cdef th.Connection *p = new th.Connection()
-		p[0] = th.CallbackTimer_connect(self.p_this, function)
-		return wrap_connection(p)
+    def connect(self, function):
+        cdef th.Connection *p = new th.Connection()
+        p[0] = CallbackTimer_connect(self.p_this, function)
+        return wrap_connection(p)
 
-	def clear_connections(self):
-		self.p_this.clearConnections()
+    def clear_connections(self):
+        self.p_this.clearConnections()
 
 
 cdef class StopWatch:
-	cdef th.StopWatch *p_this
+    cdef th.StopWatch *p_this
 
-	def __cinit__(self):
-		self.p_this = new th.StopWatch()
+    def __init__(self):
+        self.p_this = new th.StopWatch()
 
-	def __dealloc__(self):
-		del self.p_this
+    def __dealloc__(self):
+        del self.p_this
 
-	def start(self):
-		self.p_this.start()
+    property elapsed_time:
+        def __get__(self):
+            cdef sf.Time* p = new sf.Time()
+            p[0] = self.p_this.getElapsedTime()
+            return wrap_time(p)
 
-	def stop(self):
-		self.p_this.stop()
+    property running:
+        def __get__(self):
+            return self.p_this.isRunning()
 
-	property running:
-		def __get__(self):
-			return self.p_this.isRunning()
+    def start(self):
+        self.p_this.start()
 
-	def reset(self):
-		self.p_this.reset()
+    def stop(self):
+        self.p_this.stop()
 
-	def restart(self):
-		self.p_this.restart()
+    def reset(self):
+        self.p_this.reset()
 
-	property elapsed_time:
-		def __get__(self):
-			cdef sf.Time* p = new sf.Time()
-			p[0] = self.p_this.getElapsedTime()
-			return wrap_time(p)
+    def restart(self):
+        self.p_this.restart()

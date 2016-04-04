@@ -21,152 +21,145 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #-------------------------------------------------------------------------------
 
-cimport libcpp.sfml as sf
-cimport libcpp.thor as th
+cimport sfml as sf
+cimport thor as th
 
 from pysfml.system cimport Vector2
-from pysfml.graphics cimport Rectangle
 from pysfml.graphics cimport Color, wrap_color
 from pysfml.graphics cimport Image
 from pysfml.graphics cimport TransformableDrawable
 from pysfml.graphics cimport RenderTarget, RenderStates
 from pysfml.graphics cimport floatrect_to_rectangle
+from pythor.graphics cimport wrap_bigtexture
 
+__all__ = ['BigTexture', 'BigSprite', 'ColorGradient', 'blend_colors']
 
-cdef class BigTexture:
-	cdef th.BigTexture *p_this
-	cdef bint                  delete_this
+cdef public class BigTexture[type PyBigTextureType, object PyBigTextureObject]:
+    cdef th.BigTexture *p_this
 
-	def __cinit__(self):
-		self.p_this = new th.BigTexture()
-		self.delete_this = True
+    def __init__(self):
+        self.p_this = new th.BigTexture()
 
-	def __dealloc__(self):
-		if self.delete_this: del self.p_this
+    def __dealloc__(self):
+        del self.p_this
 
-	@classmethod
-	def from_file(cls, filename):
-		cdef th.BigTexture *p = new th.BigTexture()
-		cdef char* encoded_filename
+    @classmethod
+    def from_file(cls, filename):
+        cdef th.BigTexture *p = new th.BigTexture()
+        cdef char* encoded_filename
 
-		encoded_filename_temporary = filename.encode('UTF-8')
-		encoded_filename = encoded_filename_temporary
+        encoded_filename_temporary = filename.encode('UTF-8')
+        encoded_filename = encoded_filename_temporary
 
-		if p.loadFromFile(encoded_filename):
-			return wrap_bigtexture(p)
+        if p.loadFromFile(encoded_filename):
+            return wrap_bigtexture(p)
 
-		del p
-		# TODO: print the right message error
-		raise IOError("Couldn't load sf.BigTexture")
-		# raise IOError(pop_error_message())
+        del p
+        raise IOError("Failed to load the image")
 
-	@classmethod
-	def from_memory(cls, bytes data):
-		cdef th.BigTexture *p = new th.BigTexture()
+    @classmethod
+    def from_memory(cls, bytes data):
+        cdef th.BigTexture *p = new th.BigTexture()
 
-		if p.loadFromMemory(<char*>data, len(data)):
-			return wrap_bigtexture(p)
+        if p.loadFromMemory(<void*>data, len(data)):
+            return wrap_bigtexture(p)
 
-		del p
-		# TODO: print the right message error
-		raise IOError("Couldn't load sf.BigTexture")
-		# raise IOError(pop_error_message())
+        del p
+        raise IOError("Failed to load the image")
 
-	@classmethod
-	def from_image(cls, Image image):
-		cdef th.BigTexture *p = new th.BigTexture()
+    @classmethod
+    def from_image(cls, Image image):
+       cdef th.BigTexture *p = new th.BigTexture()
 
-		if p.loadFromImage(image.p_this[0]):
-			return wrap_bigtexture(p)
+       if p.loadFromImage(image.p_this[0]):
+           return wrap_bigtexture(p)
 
-		del p
-		# TODO: print the right message error
-		raise IOError("Couldn't load sf.BigTexture")
-		# raise IOError(pop_error_message())
+       del p
+       raise IOError("Failed to load the image")
 
-	property size:
-		def __get__(self):
-			return Vector2(self.p_this.getSize().x, self.p_this.getSize().y)
+    property size:
+        def __get__(self):
+            return Vector2(self.p_this.getSize().x, self.p_this.getSize().y)
 
-	def swap(self, BigTexture other):
-		self.p_this.swap(other.p_this[0])
+    property smooth:
+        def __get__(self):
+            return self.p_this.isSmooth()
 
-cdef BigTexture wrap_bigtexture(th.BigTexture *p):
-	cdef BigTexture r = BigTexture.__new__(BigTexture)
-	r.p_this = p
-	return r
+        def __set__(self, bint smooth):
+            self.p_this.setSmooth(smooth)
 
 
 cdef class BigSprite(TransformableDrawable):
-	cdef th.BigSprite *p_this
-	cdef BigTexture           m_texture
+    cdef th.BigSprite *p_this
+    cdef BigTexture m_texture
 
-	def __cinit__(self, BigTexture texture=None):
-		if not texture:
-			self.p_this = new th.BigSprite()
-		else:
-			self.p_this = new th.BigSprite(texture.p_this[0])
-			m_texture = texture
+    def __init__(self, BigTexture texture=None):
+        if self.p_this == NULL:
+            if not texture:
+                self.p_this = new th.BigSprite()
+            else:
+                self.p_this = new th.BigSprite(texture.p_this[0])
+                m_texture = texture
 
-		self.p_drawable = <sf.Drawable*>self.p_this
-		self.p_transformable = <sf.Transformable*>self.p_this
+            self.p_drawable = <sf.Drawable*>self.p_this
+            self.p_transformable = <sf.Transformable*>self.p_this
 
-	def __dealloc__(self):
-		del self.p_this
+    def __dealloc__(self):
+        self.p_drawable = NULL
+        self.p_transformable = NULL
+        if self.p_this != NULL:
+            del self.p_this
 
-	def draw(self, RenderTarget target, RenderStates states):
-		target.p_rendertarget.draw((<sf.Drawable*>self.p_this)[0])
+    def draw(self, RenderTarget target, RenderStates states):
+        target.p_rendertarget.draw((<sf.Drawable*>self.p_this)[0])
 
-	property texture:
-		def __get__(self):
-			return NotImplemented
+    property texture:
+        def __get__(self):
+            return NotImplemented
 
-		def __set__(self, BigTexture texture):
-			self.p_this.setTexture(texture.p_this[0])
-			self.m_texture = texture
+        def __set__(self, BigTexture texture):
+            self.p_this.setTexture(texture.p_this[0])
+            self.m_texture = texture
 
-	property color:
-		def __get__(self):
-			cdef th.Color* p = new th.Color()
-			p[0] = self.p_this.getColor()
-			return wrap_color(p)
+    property color:
+        def __get__(self):
+            cdef sf.Color* p = new sf.Color()
+            p[0] = self.p_this.getColor()
+            return wrap_color(p)
 
-		def __set__(self, Color color):
-			self.p_this.setColor(color.p_this[0])
+        def __set__(self, Color color):
+            self.p_this.setColor(color.p_this[0])
 
-	property local_bounds:
-		def __get__(self):
-			cdef sf.FloatRect p = self.p_this.getLocalBounds()
-			return floatrect_to_rectangle(&p)
+    property local_bounds:
+        def __get__(self):
+            cdef sf.FloatRect p = self.p_this.getLocalBounds()
+            return floatrect_to_rectangle(&p)
 
-	property global_bounds:
-		def __get__(self):
-			cdef sf.FloatRect p = self.p_this.getGlobalBounds()
-			return floatrect_to_rectangle(&p)
+    property global_bounds:
+        def __get__(self):
+            cdef sf.FloatRect p = self.p_this.getGlobalBounds()
+            return floatrect_to_rectangle(&p)
+
 
 cdef public class ColorGradient[type PyColorGradientType, object PyColorGradientObject]:
-	cdef th.ColorGradient *p_this
+    cdef th.ColorGradient *p_this
 
-	def __init__(self, Color color):
-		self.p_this = new th.ColorGradient(color.p_this[0])
+    def __init__(self):
+       self.p_this = new th.ColorGradient()
 
-	def __dealloc__(self):
-		del self.p_this
+    def __dealloc__(self):
+       del self.p_this
 
-	def get_color(self, float interpolation):
-		cdef sf.Color* p = new sf.Color()
-		p[0] = self.p_this.getColor(interpolation)
-		return wrap_color(p)
+    def __setitem__(self, float position, Color color):
+        self.p_this[0][position] = color.p_this[0]
 
-cdef api object wrap_colorgradient(th.ColorGradient *p):
-	cdef ColorGradient r = ColorGradient.__new__(ColorGradient)
-	r.p_this = p
-	return r
+    def sample_color(self, float position):
+        cdef sf.Color* p = new sf.Color()
+        p[0] = self.p_this.sampleColor(position)
+        return wrap_color(p)
+
 
 def blend_colors(Color first_color, Color second_color, float interpolation):
-	cdef th.Color* p = new th.Color()
-	p[0] = th.blendColors(first_color.p_this[0], second_color.p_this[0], interpolation)
-	return wrap_color(p)
-
-def create_gradient(object mylist):
-	return th.createGradientFromList(mylist)
+   cdef sf.Color* p = new sf.Color()
+   p[0] = th.blendColors(first_color.p_this[0], second_color.p_this[0], interpolation)
+   return wrap_color(p)

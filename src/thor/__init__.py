@@ -1,9 +1,9 @@
-from thor.animation import *
-from thor.events    import *
-from thor.graphics  import *
-from thor.math      import *
-from thor.particles import *
-from thor.resources import *
-from thor.shapes    import *
-from thor.time      import *
-from thor.vectors   import *
+#import thor.animation
+#import thor.input
+#import thor.graphics
+#import thor.math
+#import thor.particles
+#import thor.resources
+#import thor.shapes
+#import thor.time
+import thor.vectors

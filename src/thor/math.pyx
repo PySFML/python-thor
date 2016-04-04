@@ -21,122 +21,124 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #-------------------------------------------------------------------------------
 
-cimport libcpp.sfml as sf
-cimport libcpp.thor as th
+cimport sfml as sf
+cimport thor as th
 
 from pysfml.system cimport Time
 from pysfml.system cimport to_vector2f
 
-cdef public class Distribution[type PyDistributionType, object PyDistributionObject]:
-	cdef th.DistributionAPI *p_this
+def foobar(): pass
 
-	# TODO: forbid functions that take arguments
-	def __init__(self, object constant_or_functor):
-		cdef object functor
+#cdef public class Distribution[type PyDistributionType, object PyDistributionObject]:
+#	cdef th.DistributionAPI *p_this
 
-		if '__call__' in dir(constant_or_functor):
-			functor = constant_or_functor
-		else:
-			functor = lambda: constant_or_functor
+#	# TODO: forbid functions that take arguments
+#	def __init__(self, object constant_or_functor):
+#		cdef object functor
 
-		self.p_this = <th.DistributionAPI*>new th.DistributionObject(functor)
+#		if '__call__' in dir(constant_or_functor):
+#			functor = constant_or_functor
+#		else:
+#			functor = lambda: constant_or_functor
 
-	def __dealloc__(self):
-		del self.p_this
+#		self.p_this = <th.DistributionAPI*>new th.DistributionObject(functor)
 
-	def __call__(self):
-		return self.p_this[0]()
+#	def __dealloc__(self):
+#		del self.p_this
 
-cdef Distribution wrap_floatdistribution(th.Distribution[float] *p):
-	cdef Distribution r = Distribution.__new__(Distribution)
-	r.p_this = <th.DistributionAPI*>new th.DistributionFloat(p[0])
-	return r
+#	def __call__(self):
+#		return self.p_this[0]()
 
-cdef Distribution wrap_vector2distribution(th.Distribution[sf.Vector2f] *p):
-	cdef Distribution r = Distribution.__new__(Distribution)
-	r.p_this = <th.DistributionAPI*>new th.DistributionVector2(p[0])
-	return r
+#cdef Distribution wrap_floatdistribution(th.Distribution[float] *p):
+#	cdef Distribution r = Distribution.__new__(Distribution)
+#	r.p_this = <th.DistributionAPI*>new th.DistributionFloat(p[0])
+#	return r
 
-cdef Distribution wrap_timedistribution(th.Distribution[sf.Time] *p):
-	cdef Distribution r = Distribution.__new__(Distribution)
-	r.p_this = <th.DistributionAPI*>new th.DistributionTime(p[0])
-	return r
+#cdef Distribution wrap_vector2distribution(th.Distribution[sf.Vector2f] *p):
+#	cdef Distribution r = Distribution.__new__(Distribution)
+#	r.p_this = <th.DistributionAPI*>new th.DistributionVector2(p[0])
+#	return r
 
-cdef Distribution wrap_colordistribution(th.Distribution[sf.Color] *p):
-	cdef Distribution r = Distribution.__new__(Distribution)
-	r.p_this = <th.DistributionAPI*>new th.DistributionColor(p[0])
-	return r
+#cdef Distribution wrap_timedistribution(th.Distribution[sf.Time] *p):
+#	cdef Distribution r = Distribution.__new__(Distribution)
+#	r.p_this = <th.DistributionAPI*>new th.DistributionTime(p[0])
+#	return r
 
-def uniform_integer(float begin, float end):
-	cdef th.Distribution[float] *p = new th.Distribution[float](0)
-	p[0] = th.distributions.uniform(begin, end)
-	return wrap_floatdistribution(p)
+#cdef Distribution wrap_colordistribution(th.Distribution[sf.Color] *p):
+#	cdef Distribution r = Distribution.__new__(Distribution)
+#	r.p_this = <th.DistributionAPI*>new th.DistributionColor(p[0])
+#	return r
 
-def uniform_time(Time begin, Time end):
-	cdef th.Distribution[sf.Time] *p = new th.Distribution[sf.Time](sf.seconds(1))
-	p[0] = th.distributions.uniform(<sf.Time>begin.p_this[0], <sf.Time>end.p_this[0])
-	return wrap_timedistribution(p)
+#def uniform_integer(float begin, float end):
+#	cdef th.Distribution[float] *p = new th.Distribution[float](0)
+#	p[0] = th.distributions.uniform(begin, end)
+#	return wrap_floatdistribution(p)
 
-def rect(center, half_size):
-	cdef th.Distribution[sf.Vector2f] *p = new th.Distribution[sf.Vector2f](sf.Vector2f())
-	p[0] = th.distributions.rect(to_vector2f(center), to_vector2f(half_size))
-	return wrap_vector2distribution(p)
+#def uniform_time(Time begin, Time end):
+#	cdef th.Distribution[sf.Time] *p = new th.Distribution[sf.Time](sf.seconds(1))
+#	p[0] = th.distributions.uniform(<sf.Time>begin.p_this[0], <sf.Time>end.p_this[0])
+#	return wrap_timedistribution(p)
 
-def circle(center, float radius):
-	cdef th.Distribution[sf.Vector2f] *p = new th.Distribution[sf.Vector2f](sf.Vector2f())
-	p[0] = th.distributions.circle(to_vector2f(center), radius)
-	return wrap_vector2distribution(p)
+#def rect(center, half_size):
+#	cdef th.Distribution[sf.Vector2f] *p = new th.Distribution[sf.Vector2f](sf.Vector2f())
+#	p[0] = th.distributions.rect(to_vector2f(center), to_vector2f(half_size))
+#	return wrap_vector2distribution(p)
 
-def deflect(direction, float max_rotation):
-	cdef th.Distribution[sf.Vector2f] *p = new th.Distribution[sf.Vector2f](sf.Vector2f())
-	p[0] = th.distributions.deflect(to_vector2f(direction), max_rotation)
-	return wrap_vector2distribution(p)
+#def circle(center, float radius):
+#	cdef th.Distribution[sf.Vector2f] *p = new th.Distribution[sf.Vector2f](sf.Vector2f())
+#	p[0] = th.distributions.circle(to_vector2f(center), radius)
+#	return wrap_vector2distribution(p)
 
-def random(float begin, float end):
-	return th.random(begin, end)
+#def deflect(direction, float max_rotation):
+#	cdef th.Distribution[sf.Vector2f] *p = new th.Distribution[sf.Vector2f](sf.Vector2f())
+#	p[0] = th.distributions.deflect(to_vector2f(direction), max_rotation)
+#	return wrap_vector2distribution(p)
 
-def random_dev(float middle, float deviation):
-	return th.randomDev(middle, deviation)
+#def random(float begin, float end):
+#	return th.random(begin, end)
 
-def set_random_seed(unsigned long seed):
-	th.setRandomSeed(seed)
+#def random_dev(float middle, float deviation):
+#	return th.randomDev(middle, deviation)
+
+#def set_random_seed(unsigned long seed):
+#	th.setRandomSeed(seed)
 
 
-cdef class Edge:
-	cdef th.Edge[unsigned long] *p_this
-	cdef object                     c0, c1
-	cdef unsigned long              p_c0, p_c1
+#cdef class Edge:
+#	cdef th.Edge[unsigned long] *p_this
+#	cdef object                     c0, c1
+#	cdef unsigned long              p_c0, p_c1
 
-	def __init__(self, object corner0, object corner1):
-		self.c0, self.c1 = corner0, corner1
+#	def __init__(self, object corner0, object corner1):
+#		self.c0, self.c1 = corner0, corner1
 
-		self.p_c0 = <unsigned long><void*>self.c0
-		self.p_c1 = <unsigned long><void*>self.c1
+#		self.p_c0 = <unsigned long><void*>self.c0
+#		self.p_c1 = <unsigned long><void*>self.c1
 
-		self.p_this = new th.Edge[unsigned long](self.p_c0, self.p_c1)
+#		self.p_this = new th.Edge[unsigned long](self.p_c0, self.p_c1)
 
-	def __dealloc__(self):
-		del self.p_this
+#	def __dealloc__(self):
+#		del self.p_this
 
-	def __getitem__(self, unsigned int key):
-		return <object><void*>self.p_this[0][key]
+#	def __getitem__(self, unsigned int key):
+#		return <object><void*>self.p_this[0][key]
 
-cdef class Triangle:
-	cdef th.Triangle[unsigned long] *p_this
-	cdef object                         c0, c1, c2
-	cdef unsigned long                  p_c0, p_c1, p_c2
+#cdef class Triangle:
+#	cdef th.Triangle[unsigned long] *p_this
+#	cdef object                         c0, c1, c2
+#	cdef unsigned long                  p_c0, p_c1, p_c2
 
-	def __init__(self, object corner0, object corner1, object corner2):
-		self.c0, self.c1, self.c2 = corner0, corner1, corner2
+#	def __init__(self, object corner0, object corner1, object corner2):
+#		self.c0, self.c1, self.c2 = corner0, corner1, corner2
 
-		self.p_c0 = <unsigned long><void*>self.c0
-		self.p_c1 = <unsigned long><void*>self.c1
-		self.p_c2 = <unsigned long><void*>self.c2
+#		self.p_c0 = <unsigned long><void*>self.c0
+#		self.p_c1 = <unsigned long><void*>self.c1
+#		self.p_c2 = <unsigned long><void*>self.c2
 
-		self.p_this = new th.Triangle[unsigned long](self.p_c0, self.p_c1, self.p_c2)
+#		self.p_this = new th.Triangle[unsigned long](self.p_c0, self.p_c1, self.p_c2)
 
-	def __dealloc__(self):
-		del self.p_this
+#	def __dealloc__(self):
+#		del self.p_this
 
-	def __getitem__(self, unsigned int key):
-		return <object><void*>self.p_this[0][key]
+#	def __getitem__(self, unsigned int key):
+#		return <object><void*>self.p_this[0][key]

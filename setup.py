@@ -1,166 +1,114 @@
 import sys, os, platform
 import shutil
+from glob import glob
 from subprocess import call
 from distutils.core import setup, Extension
 
-# check if cython is installed somewhere
 try:
-	raise ImportError
-	from Cython.Distutils import build_ext as _build_ext
-	CYTHON_AVAILABLE = True
+    from Cython.Distutils import build_ext
 except ImportError:
-	# on unix platforms, check if cython isn't installed in another
-	# python version, then compile manually
-	if platform.system() == 'Linux':
-		call('cython --cplus src/thor/graphics.pyx -Iinclude --fast-fail', shell=True)
-		call('mv src/thor/graphics.h include/pythor', shell=True)
-		call('mv src/thor/graphics_api.h include/pythor', shell=True)
-		call('cython --cplus src/thor/events.pyx -Iinclude --fast-fail', shell=True)
-		call('mv src/thor/events.h include/pythor', shell=True)
-		call('cython --cplus src/thor/resources.pyx -Iinclude --fast-fail', shell=True)
-		call('cython --cplus src/thor/shapes.pyx -Iinclude --fast-fail', shell=True)
-		call('cython --cplus src/thor/math.pyx -Iinclude --fast-fail', shell=True)
-		call('mv src/thor/math.h include/pythor', shell=True)
-		call('cython --cplus src/thor/time.pyx -Iinclude --fast-fail', shell=True)
-		call('cython --cplus src/thor/animation.pyx -Iinclude --fast-fail', shell=True)
-		call('mv src/thor/animation.h include/pythor', shell=True)
-		call('cython --cplus src/thor/particles.pyx -Iinclude --fast-fail', shell=True)
-		call('mv src/thor/particles_api.h include/pythor', shell=True)
-		call('cython --cplus src/thor/vectors.pyx -Iinclude --fast-fail', shell=True)
+    print("Please install cython and try again.")
+    raise SystemExit
 
-	from distutils.command import build_ext as _build_ext
-	CYTHON_AVAILABLE = False
+if platform.architecture()[0] == "32bit":
+	arch = "x86"
+elif platform.architecture()[0] == "64bit":
+	arch = "x64"
 
-# check if cython is needed (if c++ files are generated or not)
-sources = dict(
-	animation = 'src/thor/animation.cpp',
-	events = 'src/thor/events.cpp',
-	resources = 'src/thor/resources.cpp',
-	shapes = 'src/thor/shapes.cpp',
-	math = 'src/thor/math.cpp',
-	time = 'src/thor/time.cpp',
-	graphics = 'src/thor/graphics.cpp',
-	particles = 'src/thor/particles.cpp',
-	vectors = 'src/thor/vectors.cpp')
+class CythonBuildExt(build_ext):
+    """ Updated version of cython build_ext command to move
+    the generated API headers to include/pythor directory
+    """
 
-NEED_CYTHON = not all(map(os.path.exists, sources.values()))
+    def cython_sources(self, sources, extension):
+        ret = build_ext.cython_sources(self, sources, extension)
 
-if NEED_CYTHON and not CYTHON_AVAILABLE:
-	print("Please install cython and try again. Or use an official release with pre-generated source")
-	raise SystemExit(1)
+        # should result the module name; e.g, graphics[.pyx]
+        module = os.path.basename(sources[0])[:-4]
 
-if CYTHON_AVAILABLE:
-	class build_ext(_build_ext):
-		""" Updated version of cython build_ext command to move
-		the generated API headers to include/pythor directory
-		"""
+        # move its headers (foo.h and foo_api.h) to include/pythor
+        destination = os.path.join('include', 'pythor')
 
-		def cython_sources(self, sources, extension):
-			ret = _build_ext.cython_sources(self, sources, extension)
+        source = os.path.join('src', 'thor', module + '.h')
+        if os.path.isfile(source):
+            try:
+                shutil.move(source, destination)
+            except shutil.Error:
+                pass
 
-			# should result the module name; e.g, graphics[.pyx]
-			module = os.path.basename(sources[0])[:-4]
+        source = os.path.join('src', 'thor', module + '_api.h')
+        if os.path.isfile(source):
+            try:
+                shutil.move(source, destination)
+            except shutil.Error:
+                pass
 
-			# move its headers (foo.h and foo_api.h) to include/pysfml
-			destination = "include/pythor"
+        return ret
 
-			source = "src/thor/{0}.h".format(module)
-			if os.path.isfile(source):
-				try:
-					shutil.move(source, destination)
-				except shutil.Error:
-					pass
 
-			source = "src/thor/{0}_api.h".format(module)
-			if os.path.isfile(source):
-				try:
-					shutil.move(source, destination)
-				except shutil.Error:
-					pass
+modules = ['math', 'vectors', 'input', 'graphics', 'shapes', 'time']
 
-			return ret
+# clean the directory (remove generated C++ files by Cython)
+def remove_if_exist(filename):
+    if os.path.isfile(filename):
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
 
-sources = dict(
-	animation = 'src/thor/animation.pyx',
-	events = 'src/thor/events.pyx',
-	resources = 'src/thor/resources.pyx',
-	shapes = 'src/thor/shapes.pyx',
-	math = 'src/thor/math.pyx',
-	time = 'src/thor/time.pyx',
-	graphics = 'src/thor/graphics.pyx',
-	particles = 'src/thor/particles.pyx',
-	vectors = 'src/thor/vectors.pyx')
+include_path = os.path.join('include', 'pythor')
+source_path = os.path.join('src', 'thor')
 
-if not CYTHON_AVAILABLE:
-	sources = {k: v.replace('pyx', 'cpp') for k, v in sources.items()}
+for module in modules:
+    remove_if_exist(os.path.join(include_path, module + '.h'))
+    remove_if_exist(os.path.join(include_path, module + '._api.h'))
+    remove_if_exist(os.path.join(source_path, module + '.cpp'))
 
-libs = ['sfml-system',
-		'sfml-window',
-		'sfml-graphics',
-		'sfml-audio',
-		'sfml-network',
-		'thor']
 
 extension = lambda name, files: Extension(
     'thor.' + name,
     sources=files,
-    include_dirs=['include'],
+    include_dirs=['include/Includes', 'include', '/usr/include'],
     language='c++',
-    extra_compile_args = ['--std=c++0x', '-fpermissive'],
-    libraries=libs)
-
-animation = extension(
-	'animation',
-	[sources['animation']])
-
-events = extension(
-	'events',
-	[sources['events']])
-
-resources = extension(
-	'resources',
-	[sources['resources']])
-
-shapes = extension(
-	'shapes',
-	[sources['shapes']])
+    extra_compile_args = ['-std=c++11', '-fpermissive'],
+    libraries=['sfml-system', 'sfml-window', 'sfml-graphics', 'sfml-audio', 'sfml-network', 'thor'])
 
 math = extension(
 	'math',
-	[sources['math'], 'src/thor/DistributionAPI.cpp'])
-
-time = extension(
-	'time',
-	[sources['time'], 'src/thor/listeners.cpp'])
-
-graphics = extension(
-	'graphics',
-	[sources['graphics'], 'src/thor/createGradient.cpp'])
-
-particles_files = list()
-particles_files.append(sources['particles'])
-particles_files.append('src/thor/particles/DerivableAffector.cpp')
-particles_files.append('src/thor/particles/DerivableEmitter.cpp')
-particles_files.append('src/thor/particles/utilities.cpp')
-
-particles = extension(
-	'particles',
-	particles_files)
+	['src/thor/math.pyx', 'src/thor/TrigonometricTraits.cpp'])
 
 vectors = extension(
 	'vectors',
-	[sources['vectors'], 'src/thor/vectors/PolarVector2Object.cpp'])
+	['src/thor/vectors.pyx'])
 
-extensions = [graphics,
-				events,
-				resources,
-				shapes,
-				math,
-				time,
-				animation,
-				particles,
-				vectors]
+_input = extension(
+	'input',
+	['src/thor/input.pyx'])
 
+graphics = extension(
+	'graphics',
+	['src/thor/graphics.pyx'])
+
+shapes = extension(
+	'shapes',
+	['src/thor/shapes.pyx'])
+
+time = extension(
+	'time',
+	['src/thor/time.pyx', 'src/thor/TimerFunctor.cpp'])
+
+#extensions = [_input, time]
+extensions = [math, vectors]
+
+## Install C headers
+#if platform.system() == 'Windows':
+    ## On Windows: C:\Python27\include\pythor\*_api.h
+    #c_headers = [(sys.exec_prefix +'\\include\\pythor', glob('include/pythor/*.h'))]
+#else:
+    ## On Unix: /usr/local/include/pythor/*_api.h
+    #c_headers = [(sys.exec_prefix + '/include/pythor', glob('include/pythor/*.h'))]
+
+#files = c_headers
 
 with open('README.rst', 'r') as f:
     long_description = f.read()
@@ -186,9 +134,6 @@ kwargs = dict(
                         'Topic :: Games/Entertainment',
                         'Topic :: Multimedia',
                         'Topic :: Software Development :: Libraries :: Python Modules'],
-            cmdclass=dict())
-
-if CYTHON_AVAILABLE:
-	kwargs['cmdclass'].update({'build_ext': build_ext})
+            cmdclass={'build_ext': CythonBuildExt})
 
 setup(**kwargs)
