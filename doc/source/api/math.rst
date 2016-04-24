@@ -1,17 +1,104 @@
 Math
 ====
+There isn't any complete documentation or API reference for the
+math module of pyThor yet. Everything below is just quick notes. You'll
+also find numerous piece of code to understand how to use this module.
 
-.. contents:: :local:
-.. py:module:: thor.math
+In general, features translate trivially into Python and with the absence
+of a complete API reference, you should refer to the C++ documentation to
+understand how this module work. Indeed, Python and C++ aren't the same
+language and several time, features had to be implemented differently or
+simply omitted. This is where this incomplete documention comes in handy
+because it lists the things you should know to fill that gap.
 
-MyClassOne
-----------
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut erat eros. Quisque ullamcorper euismod turpis et fringilla. Aliquam id nisi arcu, at suscipit nulla. Nullam eu nibh tincidunt ante molestie volutpat. Morbi venenatis, risus eu tempor suscipit, orci massa pellentesque urna, quis egestas magna est sed turpis. Nulla pellentesque tempor faucibus. Quisque aliquam ullamcorper massa vel fermentum. Phasellus sit amet erat lorem. Aliquam a lectus ut sapien faucibus pellentesque. Curabitur tristique viverra urna vitae mattis. Integer et libero non nunc pellentesque interdum id ac felis. Nam a ligula in nisl sodales dictum non vel leo. Mauris sem metus, pretium eu euismod nec, tempus a erat. Integer volutpat sagittis justo, vel aliquam tellus molestie ut. Nulla mattis sagittis erat, id aliquet neque elementum et.
+Below, you'll find various developer notes. Unless you want to hack the
+source code, it's unlikely that they are relevant to you. Please, ignore
+them; I had to store them somewhere.
 
-MyClassTwo
-----------
-Vestibulum ornare velit at sem imperdiet at bibendum felis condimentum. Quisque posuere varius tellus sed mollis. Vestibulum sit amet neque eget arcu aliquam sollicitudin. Etiam non purus nulla, non sodales orci. Nulla fringilla orci a ligula faucibus nec convallis felis viverra. Nulla volutpat magna velit, non pretium ante. Fusce faucibus tincidunt mi, vel commodo est venenatis nec. Praesent vel quam nunc, ultrices porttitor erat. Fusce sed neque elit, nec fermentum lectus. Cras eleifend dui urna. In sapien dui, imperdiet at eleifend at, accumsan vitae augue. Nam porttitor tristique ligula non lacinia. Ut ullamcorper, ligula vitae condimentum faucibus, erat eros lobortis ligula, sit amet commodo turpis sapien ut velit. Maecenas tristique gravida metus, posuere fringilla lectus imperdiet ac. Sed sed felis leo, eu sodales dui. Donec at dolor ac libero gravida elementum at vel urna.
+Randomize and Mathematics utilities
+-----------------------------------
+About randomization utilities, nothing much change in Python ::
 
-MyClassThree
-------------
-Nulla magna lectus, porttitor et condimentum a, sagittis quis lectus. Nunc lacus sem, cursus eu facilisis quis, elementum eget diam. Phasellus mi mi, vehicula quis molestie in, condimentum vel augue. Maecenas facilisis rutrum diam a luctus. Vivamus luctus, lacus eget ultrices iaculis, lorem tellus consequat dolor, at laoreet nulla enim ut erat. Curabitur convallis magna et magna blandit sagittis eu id lacus. Proin sollicitudin semper nunc, porta commodo nulla tristique eget. Etiam at justo libero, eget congue arcu. Suspendisse non enim quam. Nulla ullamcorper, quam ac feugiat facilisis, turpis sapien lobortis nunc, non cursus risus massa sit amet arcu. Phasellus dolor arcu, placerat eu venenatis tempus, condimentum at urna. Duis turpis turpis, iaculis vitae auctor eget, rhoncus quis arcu. Aliquam bibendum consequat dui sit amet luctus. Quisque id lacus nunc, eu molestie augue. 
+    from thor import th
+
+    th.set_random_seed(seed) # seed is an int
+
+    th.random(min_, max_) # works with any numeric
+    th.random_dev(middle, deviation) # work with float
+
+Thor provides the PI constant with two converting function; they are
+exposed to Python as well. ::
+
+    from thor import th
+
+    print(th.PI) # display 3.14xxx
+
+    radian = th.to_radian(degree)
+    degree = th.to_degree(radian)
+
+Note that using `th.to_radian` result in calling internally `math.radians` from the
+math module from the Python standard library. The same for `th.to_degree`
+
+TODO: answer that question ::
+
+    why would we implement PI and converting function when you can find
+    them in the Python Standard library ? *Answer:* it has to do with
+    trigonometric traits
+
+
+Distributions features
+----------------------
+You can construct a Distribution function with a regular Python function
+Note that constructing a Distribution with *a constant* is *not* supported yet
+But you can work around it by implementing a functor that returns a constant. ::
+
+    from random import randint
+
+    def multiple_of_42():
+        return 42 * randint(10)
+
+    distribution = th.Distribution(multiple_of_42)
+
+    # display 10 random multiple of  42
+    for _ in range(10):
+        print(distribution())
+
+You'll need to use distributions troughout all pyThor module just like
+in the original API, such as in the Particles module to randomize particules
+effects.
+
+The static methods found in the `thor::Distributions` namespace are
+implemented in the `thor.math.Distributions` class. ::
+
+    import thor.math
+
+    uniform_distribution = thor.math.Distributions.uniform(min_, max_) # min_ and max_ could be int, float or Time
+    rect_distribution = thor.math.Distributions.rect(center, half_size)
+    circle_distribution = thor.math.Distributions.circle(center, radius)
+    deflect_distribution(direction, max_rotation)
+
+Refer to the C++ documentation to understand the type of each arguments.
+
+Triangulations features
+-----------------------
+In Thor library, three triangulation algorithms are provided. So far,
+only `triangulate` is implemented. ::
+
+    triangulate(vertices)
+    triangulate_constrained(vertices, constrained_edges) # not implemented yet!
+    triangulate_polygon(vertices)                        # not implemented yet!
+
+The function `triangulate` expects any variable that can be transformed
+into a list of vertices with `list(vertices)`. Refer to the example
+"triangulation.py" to have a working example of this function.
+
+Developers notes
+----------------
+1) In the implemetnation of Edge and Triangle, I had to book keep the
+internal vertices (the corners) because in the C++ API they're only
+references existing vertices. If the Python are not kept, then vertices
+might be freed up and it would results in segfault.
+
+2) Additionally, the math module contains the trigonometric traits for
+NumericObject from pySFML system module. This is needed in thor.vectors
+module.

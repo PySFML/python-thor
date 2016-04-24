@@ -1,17 +1,75 @@
 Graphics
 ========
+There isn't any complete documentation or API reference for the
+graphics module of pyThor yet. Everything below is just quick notes. You'll
+also find numerous piece of code to understand how to use this module.
 
-.. contents:: :local:
-.. py:module:: thor.graphics
+In general, features translate trivially into Python and with the absence
+of a complete API reference, you should refer to the C++ documentation to
+understand how this module work. Indeed, Python and C++ aren't the same
+language and several time, features had to be implemented differently or
+simply omitted. This is where this incomplete documention comes in handy
+because it lists the things you should know to fill that gap.
 
-MyClassOne
-----------
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut erat eros. Quisque ullamcorper euismod turpis et fringilla. Aliquam id nisi arcu, at suscipit nulla. Nullam eu nibh tincidunt ante molestie volutpat. Morbi venenatis, risus eu tempor suscipit, orci massa pellentesque urna, quis egestas magna est sed turpis. Nulla pellentesque tempor faucibus. Quisque aliquam ullamcorper massa vel fermentum. Phasellus sit amet erat lorem. Aliquam a lectus ut sapien faucibus pellentesque. Curabitur tristique viverra urna vitae mattis. Integer et libero non nunc pellentesque interdum id ac felis. Nam a ligula in nisl sodales dictum non vel leo. Mauris sem metus, pretium eu euismod nec, tempus a erat. Integer volutpat sagittis justo, vel aliquam tellus molestie ut. Nulla mattis sagittis erat, id aliquet neque elementum et.
+Below, you'll find various developer notes. Unless you want to hack the
+source code, it's unlikely that they are relevant to you. Please, ignore
+them; I had to store them somewhere.
 
-MyClassTwo
-----------
-Vestibulum ornare velit at sem imperdiet at bibendum felis condimentum. Quisque posuere varius tellus sed mollis. Vestibulum sit amet neque eget arcu aliquam sollicitudin. Etiam non purus nulla, non sodales orci. Nulla fringilla orci a ligula faucibus nec convallis felis viverra. Nulla volutpat magna velit, non pretium ante. Fusce faucibus tincidunt mi, vel commodo est venenatis nec. Praesent vel quam nunc, ultrices porttitor erat. Fusce sed neque elit, nec fermentum lectus. Cras eleifend dui urna. In sapien dui, imperdiet at eleifend at, accumsan vitae augue. Nam porttitor tristique ligula non lacinia. Ut ullamcorper, ligula vitae condimentum faucibus, erat eros lobortis ligula, sit amet commodo turpis sapien ut velit. Maecenas tristique gravida metus, posuere fringilla lectus imperdiet ac. Sed sed felis leo, eu sodales dui. Donec at dolor ac libero gravida elementum at vel urna.
+Big texture and sprite
+----------------------
+Nothing much to say about big texture and big sprite. Things work the
+same except for `th.BigTexture` that works exactly like `sf.Texture`. ::
 
-MyClassThree
-------------
-Nulla magna lectus, porttitor et condimentum a, sagittis quis lectus. Nunc lacus sem, cursus eu facilisis quis, elementum eget diam. Phasellus mi mi, vehicula quis molestie in, condimentum vel augue. Maecenas facilisis rutrum diam a luctus. Vivamus luctus, lacus eget ultrices iaculis, lorem tellus consequat dolor, at laoreet nulla enim ut erat. Curabitur convallis magna et magna blandit sagittis eu id lacus. Proin sollicitudin semper nunc, porta commodo nulla tristique eget. Etiam at justo libero, eget congue arcu. Suspendisse non enim quam. Nulla ullamcorper, quam ac feugiat facilisis, turpis sapien lobortis nunc, non cursus risus massa sit amet arcu. Phasellus dolor arcu, placerat eu venenatis tempus, condimentum at urna. Duis turpis turpis, iaculis vitae auctor eget, rhoncus quis arcu. Aliquam bibendum consequat dui sit amet luctus. Quisque id lacus nunc, eu molestie augue. 
+    # you cannot create an empty big texture
+    bigtexture = th.BigTexture()
+
+    # three ways to construct a big texture
+    bigtexture = th.BigTexture.from_file("image.jpg")
+
+    data = open("image.jpg", "rb").read()
+    bigtexture = th.BigTexture.from_memory(data)
+
+    image = sf.Image.from_file("image.jpg")
+    bigtexture = th.BigTexture.from_image(image)
+
+    # the two properties of big texture
+    bigtexture.smooth # boolean
+    bigtexture.size   # sf.Vector2f (read-only)
+
+Above was how to deal with `th.BigTexture`, below is how to deal with
+`th.BigSprite`. ::
+
+    # create a sprite from a big texture
+    bigsprite = th.BigSprite(bigtexture)
+
+    # the four properties available
+    bigsprite.texture
+    bigsprite.color
+
+    bigsprite.local_bounds
+    bigsprite.global_bounds
+
+Color gradient
+--------------
+Nothing surprising to say about `th.ColorGradient`. ::
+
+    # create a gradient
+    color_gradient = th.ColorGradient()
+    color_gradient[0] = sf.Color.YELLOW
+    color_gradient[1] = sf.Color.RED
+
+    # sample a color
+    print(color_gradient.sample_color(0.5))
+
+Here is how to use `th.blend_colors`. ::
+
+    # similar result with blend_colors
+    color = th.blend_colors(sf.Color.YELLOW, sf.Color.RED, 0.5)
+
+Developers notes
+----------------
+1) Passing an invalid position when sampling colors won't raise any
+exception. This will silently pass resulting in incorrect return values.
+
+2) You won't find any equivalent of `thor::setColor`, `thor::setAlpha` and
+`thor::toString` functions. I don't know how and if I should implement them.

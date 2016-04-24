@@ -1,17 +1,134 @@
 Time
 ====
+There isn't any complete documentation or API reference for the
+time module of pyThor yet. Everything below is just quick notes. You'll
+also find numerous piece of code to understand how to use this module.
 
-.. contents:: :local:
-.. py:module:: thor.time
+In general, features translate trivially into Python and with the absence
+of a complete API reference, you should refer to the C++ documentation to
+understand how this module work. Indeed, Python and C++ aren't the same
+language and several time, features had to be implemented differently or
+simply omitted. This is where this incomplete documention comes in handy
+because it lists the things you should know to fill that gap.
 
-MyClassOne
-----------
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut erat eros. Quisque ullamcorper euismod turpis et fringilla. Aliquam id nisi arcu, at suscipit nulla. Nullam eu nibh tincidunt ante molestie volutpat. Morbi venenatis, risus eu tempor suscipit, orci massa pellentesque urna, quis egestas magna est sed turpis. Nulla pellentesque tempor faucibus. Quisque aliquam ullamcorper massa vel fermentum. Phasellus sit amet erat lorem. Aliquam a lectus ut sapien faucibus pellentesque. Curabitur tristique viverra urna vitae mattis. Integer et libero non nunc pellentesque interdum id ac felis. Nam a ligula in nisl sodales dictum non vel leo. Mauris sem metus, pretium eu euismod nec, tempus a erat. Integer volutpat sagittis justo, vel aliquam tellus molestie ut. Nulla mattis sagittis erat, id aliquet neque elementum et.
+Below, you'll find various developer notes. Unless you want to hack the
+source code, it's unlikely that they are relevant to you. Please, ignore
+them; I had to store them somewhere.
 
-MyClassTwo
-----------
-Vestibulum ornare velit at sem imperdiet at bibendum felis condimentum. Quisque posuere varius tellus sed mollis. Vestibulum sit amet neque eget arcu aliquam sollicitudin. Etiam non purus nulla, non sodales orci. Nulla fringilla orci a ligula faucibus nec convallis felis viverra. Nulla volutpat magna velit, non pretium ante. Fusce faucibus tincidunt mi, vel commodo est venenatis nec. Praesent vel quam nunc, ultrices porttitor erat. Fusce sed neque elit, nec fermentum lectus. Cras eleifend dui urna. In sapien dui, imperdiet at eleifend at, accumsan vitae augue. Nam porttitor tristique ligula non lacinia. Ut ullamcorper, ligula vitae condimentum faucibus, erat eros lobortis ligula, sit amet commodo turpis sapien ut velit. Maecenas tristique gravida metus, posuere fringilla lectus imperdiet ac. Sed sed felis leo, eu sodales dui. Donec at dolor ac libero gravida elementum at vel urna.
+StopWatch
+---------
+There's simply nothing to say about that one. Everything works exactly
+the same ::
 
-MyClassThree
-------------
-Nulla magna lectus, porttitor et condimentum a, sagittis quis lectus. Nunc lacus sem, cursus eu facilisis quis, elementum eget diam. Phasellus mi mi, vehicula quis molestie in, condimentum vel augue. Maecenas facilisis rutrum diam a luctus. Vivamus luctus, lacus eget ultrices iaculis, lorem tellus consequat dolor, at laoreet nulla enim ut erat. Curabitur convallis magna et magna blandit sagittis eu id lacus. Proin sollicitudin semper nunc, porta commodo nulla tristique eget. Etiam at justo libero, eget congue arcu. Suspendisse non enim quam. Nulla ullamcorper, quam ac feugiat facilisis, turpis sapien lobortis nunc, non cursus risus massa sit amet arcu. Phasellus dolor arcu, placerat eu venenatis tempus, condimentum at urna. Duis turpis turpis, iaculis vitae auctor eget, rhoncus quis arcu. Aliquam bibendum consequat dui sit amet luctus. Quisque id lacus nunc, eu molestie augue. 
+    stopwatch = th.StopWatch()
+
+    # start the stopwatch
+    stopwatch.start()
+
+    # reset it to 0, and stop it
+    stopwatch.reset()
+
+    # reset it to 0 followed by a start
+    stopwatch.restart()
+
+    # print out the elapsed time
+    print(stopwatch.elapsed_time)
+
+    # check if the stopwatch is running
+    if stopwatch.is_running():
+        print("The stopwatch is running")
+
+    # stop it
+    stopwatch.stop()
+
+Timers
+------
+Unlike a stopwatch, time goes backward and stop running once it reaches
+time zero. ::
+
+    timer = th.Timer()
+
+    # set the timer at 1 second but don't run it
+    timer.reset(sf.seconds(1))
+
+    # start the timer
+    timer.start()
+
+    # check if running and print out the remaining time
+    while timer.is_running():
+        print(timer.remaining_time)
+
+    # restart the timer at 1 second and run it immediately afterward
+    timer.restart(sf.seconds(1))
+
+    # pause the timer after half a second
+    sf.sleep(sf.seconds(0.5))
+    timer.stop()
+
+    # check if the timer is expired
+    if timer.is_expired():
+        print("That message should never be print out")
+
+The Thor library also implements a timer that calls a callback once it
+reaches time zero. This is `CallbackTimer` and it inherits from `Timer`.
+Besides the same functionalities shown above, you can connect a callback. ::
+
+    def listener_1(timer):
+        print("Callback with arity 1")
+
+    def listener_0():
+        print("Callback with arity 0")
+
+    callback_timer = th.CallbackTimer()
+
+    # by default, it expects the listener that takes 1 argument
+    callback_timer.connect(listener_1)
+
+    # but you can cancell it out with a lambda function
+    callback_timer.connect(lambda timer: listener_0())
+
+    # frequently call the update() methods to trigger callbacks
+    callback_timer.update()
+
+    # clear out previously connected callbacks
+    callback_timer.clear_connections()
+
+Like shown in this example, there's no connect0() method just like in
+the original library. Instead use lambda to quickly clear out the
+first parameter.
+
+**Warning**: There's a known bug, when you connect more than one callback, it will result in segfault.
+
+To disconnect on specific callback without using `clear_connections()` which
+disconnect all of them, you can remember the connection instance return by the
+`connect()` method. ::
+
+    connection = callback_timer.connect(listener_1)
+
+    # later ...
+    connection.disconnect()
+
+
+You can implement your own timers and override method reset and restart()
+just like in C++
+You can also subclass CallbackTimer and provide.
+
+Developers notes
+----------------
+1) To connect a listener (aka 'a function') to a callback timer, we
+use the method `CallbackTimer.connect(listener)`. The expected function
+arity is one, where the first argument is the callback timer itself.
+In C++, two methods
+
+be 1, however, it makes sense
+
+def listener_0():
+    print("CallbackTimer: time out from LISTENER_0")
+
+def listener_1(callback_timer):
+    print("CallbackTimer: time out from LISTENER_1({0})".format(callback_timer))
+
+callback_timer.connect(lambda timer: listener_0())
+#callback_timer.connect(listener_1)
+
+2) Par facilité, j'ai passé l'object

@@ -1,17 +1,87 @@
 Shapes
 ======
+There isn't any complete documentation or API reference for the
+shapes module of pyThor yet. Everything below is just quick notes. You'll
+also find numerous piece of code to understand how to use this module.
 
-.. contents:: :local:
-.. py:module:: thor.shapes
+In general, features translate trivially into Python and with the absence
+of a complete API reference, you should refer to the C++ documentation to
+understand how this module work. Indeed, Python and C++ aren't the same
+language and several time, features had to be implemented differently or
+simply omitted. This is where this incomplete documention comes in handy
+because it lists the things you should know to fill that gap.
 
-MyClassOne
-----------
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut erat eros. Quisque ullamcorper euismod turpis et fringilla. Aliquam id nisi arcu, at suscipit nulla. Nullam eu nibh tincidunt ante molestie volutpat. Morbi venenatis, risus eu tempor suscipit, orci massa pellentesque urna, quis egestas magna est sed turpis. Nulla pellentesque tempor faucibus. Quisque aliquam ullamcorper massa vel fermentum. Phasellus sit amet erat lorem. Aliquam a lectus ut sapien faucibus pellentesque. Curabitur tristique viverra urna vitae mattis. Integer et libero non nunc pellentesque interdum id ac felis. Nam a ligula in nisl sodales dictum non vel leo. Mauris sem metus, pretium eu euismod nec, tempus a erat. Integer volutpat sagittis justo, vel aliquam tellus molestie ut. Nulla mattis sagittis erat, id aliquet neque elementum et.
+Below, you'll find various developer notes. Unless you want to hack the
+source code, it's unlikely that they are relevant to you. Please, ignore
+them; I had to store them somewhere.
 
-MyClassTwo
-----------
-Vestibulum ornare velit at sem imperdiet at bibendum felis condimentum. Quisque posuere varius tellus sed mollis. Vestibulum sit amet neque eget arcu aliquam sollicitudin. Etiam non purus nulla, non sodales orci. Nulla fringilla orci a ligula faucibus nec convallis felis viverra. Nulla volutpat magna velit, non pretium ante. Fusce faucibus tincidunt mi, vel commodo est venenatis nec. Praesent vel quam nunc, ultrices porttitor erat. Fusce sed neque elit, nec fermentum lectus. Cras eleifend dui urna. In sapien dui, imperdiet at eleifend at, accumsan vitae augue. Nam porttitor tristique ligula non lacinia. Ut ullamcorper, ligula vitae condimentum faucibus, erat eros lobortis ligula, sit amet commodo turpis sapien ut velit. Maecenas tristique gravida metus, posuere fringilla lectus imperdiet ac. Sed sed felis leo, eu sodales dui. Donec at dolor ac libero gravida elementum at vel urna.
+The concave shape
+-----------------
+The Thor library provides the ConcaveShape class which has the exact
+same interface in the SFML library. In pyThor, the ConcaveShape has the
+exact same interface as in pySFML. ::
 
-MyClassThree
-------------
-Nulla magna lectus, porttitor et condimentum a, sagittis quis lectus. Nunc lacus sem, cursus eu facilisis quis, elementum eget diam. Phasellus mi mi, vehicula quis molestie in, condimentum vel augue. Maecenas facilisis rutrum diam a luctus. Vivamus luctus, lacus eget ultrices iaculis, lorem tellus consequat dolor, at laoreet nulla enim ut erat. Curabitur convallis magna et magna blandit sagittis eu id lacus. Proin sollicitudin semper nunc, porta commodo nulla tristique eget. Etiam at justo libero, eget congue arcu. Suspendisse non enim quam. Nulla ullamcorper, quam ac feugiat facilisis, turpis sapien lobortis nunc, non cursus risus massa sit amet arcu. Phasellus dolor arcu, placerat eu venenatis tempus, condimentum at urna. Duis turpis turpis, iaculis vitae auctor eget, rhoncus quis arcu. Aliquam bibendum consequat dui sit amet luctus. Quisque id lacus nunc, eu molestie augue. 
+    shape = th.ConcaveShape()
+
+    shape.point_count = 5
+
+    for i in range(shape.point_count):
+        shape.set_point(i, (x, y))
+        print(shape.get_point(i))
+
+    shape.fill_color = sf.Color.YELLOW
+    shape.outline_color = sf.Color.GREEN
+    shape.outline_thickness = 5
+
+    print(shape.local_bounds)
+    print(shape.global_bounds)
+
+Other custom shapes
+-------------------
+The Thor library also features custom shapes; one Arrow class and
+4 functions returning convex shapes.
+
+Here is how to use the `Arrow` class. ::
+
+    # before using constructing an arrow, you can set the zero vector tolerance
+    th.Arrow.set_zero_vector_tolerance(0.2)
+
+    # the tolerance can be read back with
+    zero_vector_tolerance = th.Arrow.get_zero_vector_tolerance()
+
+    # create an arrow
+    arrow = th.Arrow()
+
+    # modify its properties
+    arrow.direction = (400, 350)
+    arrow.color = sf.Color.RED
+    arrow.thickness = 25
+
+    # the two style are th.Arrow.FORWARD and th.Arrow.LINE
+    arrow.style = th.Arrow.FORWARD
+
+With the four functions, you can create lines, rounded rectangle,
+regular polygons and stars. They are all in the `th.Shapes` class. ::
+
+    line         = th.Shapes.line((250, 250), sf.Color.RED, 10)
+    rounded_rect = th.Shapes.rounded_rect((350, 200), 25, sf.Color.GREEN, 5, sf.Color.YELLOW)
+    polygon      = th.Shapes.polygon(12, 250, sf.Color.GREEN, 5, sf.Color.CYAN)
+    star         = th.Shapes.star(8, 80, 150, sf.Color.CYAN, 5, sf.Color.YELLOW)
+
+Refer to the Thor documentation in C++ to understand the accepted parameters.
+
+Converting SFML shapes to convex shapes
+---------------------------------------
+Last thing to know about the shapes module is that function that convert
+SFML shapes into convex shapes. Pass either a circle, a rectangle or any
+of your custom shapes that subclass the `sf.Shape` and you'll get back
+the `sf.ConvexShape` version of it. ::
+
+    rectangle_convexshape = th.Shapes.to_convexshape(sf.RectangleShape((200, 200)))
+    circle_convexshape = th.Shapes.to_convexshape(sf.CircleShape(50, 50))
+
+Developers notes
+----------------
+1) Except that I didn't know if I should implement a submodule for the
+stuff in in `thor::Shapes` namespace, everything could be implemented in a
+straighyt forward and satisfying way.

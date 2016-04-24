@@ -1,165 +1,50 @@
-#-------------------------------------------------------------------------------
-# PyThor - Python bindings for Thor
-# Copyright (c) 2013-2014, Jonathan De Wachter <dewachter.jonathan@gmail.com>
-#
-# This software is provided 'as-is', without any express or implied warranty.
-# In no event will the authors be held liable for any damages arising from the
-# use of this software.
-#
-# Permission is granted to anyone to use this software for any purpose,
-# including commercial applications, and to alter it and redistribute it
-# freely, subject to the following restrictions:
-#
-# 1. The origin of this software must not be misrepresented; you must not
-#    claim that you wrote the original software. If you use this software in a
-#    product, an acknowledgment in the product documentation would be
-#    appreciated but is not required.
-#
-# 2. Altered source versions must be plainly marked as such, and must not be
-#    misrepresented as being the original software.
-#
-# 3. This notice may not be removed or altered from any source distribution.
-#-------------------------------------------------------------------------------
-
 from libcpp.string cimport string
 from sfml cimport *
 
-################################################################################
-# Math Module                                                                  #
-################################################################################
+# Math Module Declarations
+cdef extern from "../math/Distribution.hpp":
+    cdef cppclass Function:
+        pass
 
 cdef extern from "Thor/Math.hpp" namespace "thor":
 
+    cdef cppclass Distribution[T]:
+        Distribution(T) # wrong, this is to allow constant (but parameter should be U)
+        Distribution(Function)
+
+        T operator ()()
+
     cdef cppclass Edge[V]:
         Edge(V&, V&)
-        V operator[](size_t)
-        const V operator[](size_t) const
+        V& operator[] (size_t)
 
+    cdef cppclass Triangle[V]:
+        Triangle(V&, V&, V&)
+        V& operator[] (size_t)
 
+    int random(int, int)
+    unsigned int random(unsigned int, unsigned int)
+    float random(float, float)
+    float randomDev(float, float)
+    void setRandomSeed(unsigned long)
 
+    object toDegree(object)
+    object toRadian(object)
 
+    cdef const float Pi
 
-#    cdef cppclass Triangle[V]:
-#        Triangle(V&, V&, V&)
-#        V& operator[](unsigned int)
+cimport distributions
 
-#    int random(int, int)
-#    int randomDev(int, int)
-#    float random(float, float)
-#    float randomDev(float, float)
-#    void setRandomSeed(unsigned long)
-
-#cdef extern from "Thor/Math.hpp" namespace "thor":
-
-#    cdef cppclass Distribution[T]:
-#        Distribution(T)
-#        T operator ()()
-
-#cdef extern from "DistributionAPI.hpp" namespace "":
-
-#    cdef cppclass DistributionAPI:
-#        object operator ()()
-#        Distribution[float]    getFloatFunctor()
-#        Distribution[Vector2f] getVector2Functor()
-#        Distribution[Time]     getTimeFunctor()
-#        Distribution[Color]    getColorFunctor()
-
-#    cdef cppclass DistributionObject:
-#        DistributionObject(object)
-
-#        Distribution[float]    getFloatFunctor()
-#        Distribution[Vector2f] getVector2Functor()
-#        Distribution[Time]     getTimeFunctor()
-#        Distribution[Color]    getColorFunctor()
-
-#    cdef cppclass DistributionFloat:
-#        DistributionFloat(Distribution[float])
-
-#        Distribution[float]    getFloatFunctor()
-#        Distribution[Vector2f] getVector2Functor()
-#        Distribution[Time]     getTimeFunctor()
-#        Distribution[Color]    getColorFunctor()
-
-#    cdef cppclass DistributionVector2:
-#        DistributionVector2(Distribution[Vector2f])
-
-#        Distribution[float]    getFloatFunctor()
-#        Distribution[Vector2f] getVector2Functor()
-#        Distribution[Time]     getTimeFunctor()
-#        Distribution[Color]    getColorFunctor()
-
-#    cdef cppclass DistributionTime:
-#        DistributionTime(Distribution[Time])
-
-#        Distribution[float]    getFloatFunctor()
-#        Distribution[Vector2f] getVector2Functor()
-#        Distribution[Time]     getTimeFunctor()
-#        Distribution[Color]    getColorFunctor()
-
-#    cdef cppclass DistributionColor:
-#        DistributionColor(Distribution[Color])
-
-#        Distribution[float]    getFloatFunctor()
-#        Distribution[Vector2f] getVector2Functor()
-#        Distribution[Time]     getTimeFunctor()
-#        Distribution[Color]    getColorFunctor()
-
-#cimport distributions
-
-################################################################################
-# Vectors Module                                                               #
-################################################################################
+# Vectors Module Declarations
 cdef extern from "Thor/Vectors.hpp" namespace "thor":
     cdef cppclass PolarVector2[T]:
         PolarVector2()
         PolarVector2(T, T)
         PolarVector2(const Vector2[T]&)
-#        operator sf::Vector2< T > () const
         T r
         T phi
 
     ctypedef PolarVector2[float] PolarVector2f
-
-#    cdef T length[T](const Vector2[T]&)
-#    cdef T length[T](const Vector3[T]&)
-#    cdef T length[T](const PolarVector2[T]&)
-
-#    cdef T squaredLength[T](const Vector2[T]&)
-#    cdef T squaredLength[T](const Vector3[T]&)
-
-#    cdef void setLength[T](Vector2[T]&, T)
-
-#    cdef Vector2[T] unitVector[T](const Vector2[T]&)
-#    cdef Vector3[T] unitVector[T](const Vector3[T]&)
-
-#    cdef T polarAngle[T](const Vector2[T]&)
-#    cdef T polarAngle[T](const Vector3[T]&)
-#    cdef T polarAngle[T](const PolarVector2[T]&)
-
-#    cdef void setPolarAngle[T](Vector2[T]&, T)
-
-#    cdef void rotate[T](Vector2[T]&, T)
-#    cdef Vector2[T] rotatedVector[T](const Vector2[T]&, T)
-#    cdef Vector2[T] perpendicularVector[T](const Vector2[T]&)
-
-#    cdef T signedAngle[T](const Vector2[T]&, const Vector2[T]&)
-
-#    cdef T dotProduct[T](const Vector2[T]&, const Vector2[T]&)
-#    cdef T dotProduct[T](const Vector3[T]&, const Vector3[T]&)
-
-#    cdef T crossProduct[T](const Vector2[T]&, const Vector2[T]&)
-#    cdef Vector3[T] crossProduct[T](const Vector3[T]&, const Vector3[T]&)
-
-#    cdef Vector2[T] cwiseProduct[T](const Vector2[T]&, const Vector2[T]&)
-#    cdef Vector3[T] cwiseProduct[T](const Vector3[T]&, const Vector3[T]&)
-
-#    cdef Vector2[T] cwiseQuotient[T](const Vector2[T]&, const Vector2[T]&)
-#    cdef Vector3[T] cwiseQuotient[T](const Vector3[T]&, const Vector3[T]&)
-
-#    cdef Vector2[T] projectedVector[T](const Vector2[T]&, const Vector2[T]&)
-#    cdef T elevationAngle[T](const Vector3[T]&)
-#    cdef Vector3[T] toVector3[T](const Vector2[T]&)
-
 
     cdef T length[T](const Vector2[T]&)
     cdef T length[T](const Vector3[T]&)
@@ -201,21 +86,118 @@ cdef extern from "Thor/Vectors.hpp" namespace "thor":
     cdef T elevationAngle[T](const Vector3[T]&)
     cdef Vector3[T] toVector3[T](const Vector2[T]&)
 
+# Input Module Declarations
+cimport action
 
-################################################################################
-# Input module                                                                 #
-################################################################################
 cdef extern from "Thor/Input.hpp" namespace "thor":
 
-    cdef cppclass Connection:
-        Connection()
-        bint isConnected() const
-        void invalidate()
-        void disconnect()
+    cdef cppclass JoystickButton:
+        JoystickButton(unsigned int, unsigned int)
+        unsigned int joystickId
+        unsigned int button
 
-################################################################################
-# Graphics module                                                              #
-################################################################################
+    cdef cppclass JoystickAxis:
+        JoystickAxis(unsigned int, joystick.Axis, float, bint)
+        unsigned int joystickId
+        joystick.Axis axis
+        float threshold
+        bint above
+
+    cdef cppclass Action:
+        Action(keyboard.Key)
+        Action(keyboard.Key, action.ActionType)
+        Action(mouse.Button)
+        Action(mouse.Button, action.ActionType)
+        Action(JoystickButton)
+        Action(JoystickButton, action.ActionType)
+        Action(JoystickAxis)
+        Action(event.EventType)
+
+    cdef cppclass ActionMap[ActionId]:
+        ActionMap()
+        void update(Window&)
+        void pushEvent(const Event&)
+        void clearEvents()
+        Action& operator[] (const ActionId&)
+        void removeAction(const ActionId&)
+        void clearActions()
+        bint isActive(const ActionId&) const
+#        void invokeCallbacks (CallbackSystem &system, sf::Window *window) const
+
+    cdef cppclass Connection:
+        pass
+#        Connection()
+#        bint isConnected() const
+#        void invalidate()
+#        void disconnect()
+
+    cdef cppclass EventSystem[Event, EventId]:
+        EventSystem()
+        void triggerEvent(const Event&)
+#        Connection connect(const EventId&, std::function<void(const Event &)>)
+#        Connection connect0(const EventId&, std::function< void()> nullaryListener)
+        void clearConnections(EventId)
+        void clearAllConnections()
+
+# Time Module Declarations
+cdef extern from "Thor/Time.hpp" namespace "thor":
+
+    cdef cppclass Timer:
+        Timer()
+        Time getRemainingTime() const
+        bint isRunning() const
+        bint isExpired() const
+        void start()
+        void stop()
+        void reset(Time)
+        void restart(Time)
+
+    cdef cppclass CallbackTimer:
+        CallbackTimer()
+        void reset(Time)
+        void restart(Time)
+        void update()
+#        Connection connect(std::function< void(CallbackTimer &)> unaryListener)
+#        Connection connect0 (std::function< void()> nullaryListener)
+        void clearConnections()
+        Time getRemainingTime() const
+        bint isRunning() const
+        bint isExpired() const
+        void start()
+        void stop()
+
+    cdef cppclass StopWatch:
+        StopWatch()
+        Time getElapsedTime() const
+        bint isRunning() const
+        void start()
+        void stop()
+        void reset()
+        void restart()
+
+# Resources Module Declarations
+
+cdef extern from "../resources/Resource.hpp":
+    cdef cppclass ResourceLoaderFunction:
+        ResourceLoaderFunction(object)
+
+cimport dresources
+
+cdef extern from "Thor/Resources.hpp" namespace "thor":
+
+    cdef cppclass ResourceLoader[R]:
+        ResourceLoader(ResourceLoaderFunction, string)
+#        R load() const
+        string getInfo() const
+
+    cdef cppclass ResourceHolder[R, I, O]:
+        ResourceHolder()
+#        RT acquire(const I&, cosnt ResourceLoader[R]&)
+#        RT acquire(const I&, cosnt ResourceLoader[R]&, dresources.KnownIdStrategy)
+        void release(const I&)
+#        RT operator[](const I&)
+
+# Graphics Module Declarations
 cdef extern from "Thor/Graphics.hpp" namespace "thor":
 
     cdef cppclass BigTexture:
@@ -240,13 +222,11 @@ cdef extern from "Thor/Graphics.hpp" namespace "thor":
     cdef cppclass ColorGradient:
         ColorGradient()
         Color& operator[](float)
-        Color sampleColor(float)
+        Color sampleColor(float) const
 
     Color blendColors(const Color&, const Color&, float)
 
-################################################################################
-# Shapes module                                                                #
-################################################################################
+# Shapes Module Declarations
 cimport arrow, dshapes
 
 cdef extern from "Thor/Shapes.hpp" namespace "thor":
@@ -262,10 +242,15 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
         Vector2f getDirection() const
         void setThickness(float)
         float getThickness() const
-        void setColor(Color&)
+        void setColor(const Color&)
         Color getColor() const
         void setStyle(arrow.Style)
         arrow.Style getStyle() const
+
+        @staticmethod
+        void setZeroVectorTolerance(float)
+        @staticmethod
+        float getZeroVectorTolerance()
 
     cdef cppclass ConcaveShape:
         ConcaveShape()
@@ -283,33 +268,44 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
         FloatRect getLocalBounds() const
         FloatRect getGlobalBounds() const
 
-#################################################################################
-## Animation Module                                                             #
-#################################################################################
-#cdef extern from "Thor/Animation.hpp" namespace "thor":
+# Animations Module Declarations
+cdef extern from "../animations/AnimationFunction.hpp":
+    cdef cppclass AnimationFunction:
+        AnimationFunction(object)
 
-#    cdef cppclass FrameAnimation:
-#        FrameAnimation()
-#        void addFrame(float, IntRect&)
+    cdef cppclass ColorizableObject:
+        ColorizableObject(object)
 
-#    cdef cppclass ColorAnimation:
+    cdef cppclass FramableObject:
+        FramableObject(object)
+
+cdef extern from "Thor/Animations.hpp" namespace "thor":
+
+    cdef cppclass ColorAnimation:
 #        ColorAnimation(ColorGradient&)
+        void operator() (ColorizableObject&, float) const
 
-#    cdef cppclass FadeAnimation:
-#        FadeAnimation(float, float)
+    cdef cppclass FadeAnimation:
+        FadeAnimation(float, float)
+        void operator() (ColorizableObject&, float) const
 
-#    cdef cppclass Animator[Animated, Id]:
-#        Animator()
-#        void addAnimation(Id&, FrameAnimation&, Time)
-#        void addAnimation(Id&, ColorAnimation&, Time)
-#        void addAnimation(Id&, FadeAnimation&, Time)
-#        void playAnimation(Id&)
-#        void playAnimation(Id&, bint)
-#        void stopAnimation()
-#        bint isPlayingAnimation()
-#        void update(Time)
-#        void animate(Animated&)
+    cdef cppclass FrameAnimation:
+        FrameAnimation()
+        void addFrame(float, const IntRect&)
+        void addFrame(float, const IntRect&, Vector2f)
+        void operator() (FramableObject&, float) const
 
+    cdef cppclass Animator[Animated, Id]:
+        Animator()
+        Animator(const Animator&)
+        void addAnimation(const Id&, const AnimationFunction&, Time)
+        void playAnimation(const Id&)
+        void playAnimation(const Id&, bint)
+        void stopAnimation()
+        bint isPlayingAnimation() const
+        Id getPlayingAnimation() const
+        void update(Time)
+        void animate(Animated&) const
 
 #################################################################################
 ## Particles Module                                                             #
@@ -416,41 +412,3 @@ cdef extern from "Thor/Shapes.hpp" namespace "thor":
 #    affector.Ptr castTorqueAffector(torqueaffector.Ptr)
 #    affector.Ptr castScaleAffector(scaleaffector.Ptr)
 #    affector.Ptr castForceAffector(forceaffector.Ptr)
-
-################################################################################
-# Time Module                                                                  #
-################################################################################
-cdef extern from "Thor/Time.hpp" namespace "thor":
-
-    cdef cppclass CallbackTimer:
-        CallbackTimer()
-        void reset(Time)
-        void restart(Time)
-        void update()
-#        Connection connect(std::function< void(CallbackTimer &)> unaryListener)
-#        Connection connect0(std::function< void()> nullaryListener)
-        void clearConnections()
-        Time getRemainingTime() const
-        bint isRunning() const
-        bint isExpired() const
-        void start()
-        void stop()
-
-    cdef cppclass StopWatch:
-        StopWatch()
-        Time getElapsedTime() const
-        bint isRunning() const
-        void start()
-        void stop()
-        void reset()
-        void restart()
-
-    cdef cppclass Timer:
-        Timer()
-        Time getRemainingTime() const
-        bint isRunning() const
-        bint isExpired() const
-        void start()
-        void stop()
-        void reset(Time)
-        void restart(Time)

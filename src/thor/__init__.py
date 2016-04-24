@@ -1,9 +1,13 @@
-#import thor.animation
-#import thor.input
-#import thor.graphics
-#import thor.math
-#import thor.particles
-#import thor.resources
-#import thor.shapes
-#import thor.time
+import thor.math
 import thor.vectors
+
+#import thor.input
+import thor.time
+
+#import thor.resources
+
+import thor.graphics
+import thor.shapes
+
+#import thor.animations
+#import thor.particles

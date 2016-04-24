@@ -1,17 +1,114 @@
 Vectors
 =======
+There isn't any complete documentation or API reference for the
+vectors module of pyThor yet. Everything below is just quick notes. You'll
+also find numerous piece of code to understand how to use this module.
 
-.. contents:: :local:
-.. py:module:: thor.vectors
+In general, features translate trivially into Python and with the absence
+of a complete API reference, you should refer to the C++ documentation to
+understand how this module work. Indeed, Python and C++ aren't the same
+language and several time, features had to be implemented differently or
+simply omitted. This is where this incomplete documention comes in handy
+because it lists the things you should know to fill that gap.
 
-MyClassOne
-----------
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut erat eros. Quisque ullamcorper euismod turpis et fringilla. Aliquam id nisi arcu, at suscipit nulla. Nullam eu nibh tincidunt ante molestie volutpat. Morbi venenatis, risus eu tempor suscipit, orci massa pellentesque urna, quis egestas magna est sed turpis. Nulla pellentesque tempor faucibus. Quisque aliquam ullamcorper massa vel fermentum. Phasellus sit amet erat lorem. Aliquam a lectus ut sapien faucibus pellentesque. Curabitur tristique viverra urna vitae mattis. Integer et libero non nunc pellentesque interdum id ac felis. Nam a ligula in nisl sodales dictum non vel leo. Mauris sem metus, pretium eu euismod nec, tempus a erat. Integer volutpat sagittis justo, vel aliquam tellus molestie ut. Nulla mattis sagittis erat, id aliquet neque elementum et.
+Below, you'll find various developer notes. Unless you want to hack the
+source code, it's unlikely that they are relevant to you. Please, ignore
+them; I had to store them somewhere.
 
-MyClassTwo
-----------
-Vestibulum ornare velit at sem imperdiet at bibendum felis condimentum. Quisque posuere varius tellus sed mollis. Vestibulum sit amet neque eget arcu aliquam sollicitudin. Etiam non purus nulla, non sodales orci. Nulla fringilla orci a ligula faucibus nec convallis felis viverra. Nulla volutpat magna velit, non pretium ante. Fusce faucibus tincidunt mi, vel commodo est venenatis nec. Praesent vel quam nunc, ultrices porttitor erat. Fusce sed neque elit, nec fermentum lectus. Cras eleifend dui urna. In sapien dui, imperdiet at eleifend at, accumsan vitae augue. Nam porttitor tristique ligula non lacinia. Ut ullamcorper, ligula vitae condimentum faucibus, erat eros lobortis ligula, sit amet commodo turpis sapien ut velit. Maecenas tristique gravida metus, posuere fringilla lectus imperdiet ac. Sed sed felis leo, eu sodales dui. Donec at dolor ac libero gravida elementum at vel urna.
+Polar vectors
+-------------
+PolarVector2 works pretty much just like sf.Vector2. Have a look at the
+following snipped of code to understand what you can do with it. ::
 
-MyClassThree
-------------
-Nulla magna lectus, porttitor et condimentum a, sagittis quis lectus. Nunc lacus sem, cursus eu facilisis quis, elementum eget diam. Phasellus mi mi, vehicula quis molestie in, condimentum vel augue. Maecenas facilisis rutrum diam a luctus. Vivamus luctus, lacus eget ultrices iaculis, lorem tellus consequat dolor, at laoreet nulla enim ut erat. Curabitur convallis magna et magna blandit sagittis eu id lacus. Proin sollicitudin semper nunc, porta commodo nulla tristique eget. Etiam at justo libero, eget congue arcu. Suspendisse non enim quam. Nulla ullamcorper, quam ac feugiat facilisis, turpis sapien lobortis nunc, non cursus risus massa sit amet arcu. Phasellus dolor arcu, placerat eu venenatis tempus, condimentum at urna. Duis turpis turpis, iaculis vitae auctor eget, rhoncus quis arcu. Aliquam bibendum consequat dui sit amet luctus. Quisque id lacus nunc, eu molestie augue. 
+    from thor import th
+
+    # create a vector from a radius and a angle
+    polar_vector = th.PolarVector2(5, 36)
+
+    # print out the radius and the angle
+    print(polar_vector.r)   # display 5
+    print(polar_vector.phi) # display 36
+
+    # you can copy polar vectors
+    copy_polar_vector = copy(polar_vector)
+
+    # ... and unpack them
+    r, phi = copy_polar_vector
+
+    # you can also convert them to sf.Vector2 this way
+    vector2_version = polar_vector.to_vector2()
+
+    # or this way...
+    vector2_version_bis = th.PolarVector2.to_vector2(polar_vector)
+
+**Warning**: `th.PolarVector2.to_vector2` results in segfault. This is
+a known bug. Feel free to fix the bug yourself.
+
+Operations based on vectors
+---------------------------
+The vector module of Thor library provides a plethora of functions
+manipulating vectors. All of them are implemented in pyThor. ::
+
+    # create a few vector to work with
+    polar_vector = th.PolarVector2(1, 2)
+    vector2 = sf.Vector2(1, 2)
+    vector3 = sf.Vector3(1, 2, 3)
+
+    th.length(polar_vector)
+    th.length(vector2)
+    th.length(vector3)
+
+    th.squared_length(vector2)
+    th.squared_length(vector3)
+
+    th.set_length(vector2, 50)
+
+    th.unit_vector(vector2) # buggy
+    th.unit_vector(vector3) # buggy
+
+    th.polar_angle(polar_vector)
+    th.polar_angle(vector2)
+    th.polar_angle(vector3)
+
+    th.set_polar_angle(vector2, 50)
+
+    th.rotate(vector2, 35)
+
+    th.rotated_vector(vector2, 35) # buggy
+
+    th.perpendicular_vector(vector2) # buggy
+
+    th.signed_angle(sf.Vector2(1, 2), sf.Vector2(3, 4))
+
+    th.dot_product(sf.Vector2(1, 2), sf.Vector2(3, 4))
+    th.dot_product(sf.Vector3(1, 2, 3), sf.Vector3(4, 5, 6))
+
+    th.cross_product(sf.Vector2(1, 2), sf.Vector2(3, 4))
+    th.cross_product(sf.Vector3(1, 2, 3), sf.Vector3(4, 5, 6)) # buggy
+
+    th.cwise_product(sf.Vector2(1, 2), sf.Vector2(3, 4)) # buggy
+    th.cwise_product(sf.Vector3(1, 2, 3), sf.Vector3(4, 5, 6)) # buggy
+
+    th.cwise_quotient(sf.Vector2(1, 2), sf.Vector2(3, 4)) # buggy
+    th.cwise_quotient(sf.Vector3(1, 2, 3), sf.Vector3(4, 5, 6)) # buggy
+
+    th.projected_vector(sf.Vector2(1, 2), sf.Vector2(3, 4)) # buggy
+
+    th.elevation_angle(vector3)
+
+    th.to_vector3(vector2)
+
+**Warning**: Because of a bug that appears when wrapping sf::Vector2 and
+sf::Vector3, a few of them fail. Once this bug is fixed, they should all
+work properly.
+
+Developers notes
+----------------
+
+1) Because PolarVector2 has tight integration with Vector2, they need to
+hold the same object type (NumericObject). This is particularly needed
+for operator sf::Vector2<T> () operator to work.
+
+2) The trigonometric traits had to be specialized for NumericObject in
+the math module. Almost all functions in the vectors module are likely
+to fail if a bug is found in the specilization implementation.

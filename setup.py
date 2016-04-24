@@ -45,8 +45,7 @@ class CythonBuildExt(build_ext):
 
         return ret
 
-
-modules = ['math', 'vectors', 'input', 'graphics', 'shapes', 'time']
+modules = ['math', 'vectors', 'input', 'time', 'resources', 'graphics', 'shapes', 'animations', 'shapes']
 
 # clean the directory (remove generated C++ files by Cython)
 def remove_if_exist(filename):
@@ -62,53 +61,39 @@ source_path = os.path.join('src', 'thor')
 for module in modules:
     remove_if_exist(os.path.join(include_path, module + '.h'))
     remove_if_exist(os.path.join(include_path, module + '._api.h'))
-    remove_if_exist(os.path.join(source_path, module + '.cpp'))
-
+    remove_if_exist(os.path.join(source_path, module, module + '.cpp'))
+    remove_if_exist(os.path.join(source_path, module, module + '.h'))
+    remove_if_exist(os.path.join(source_path,module,  module + '._api.h'))
 
 extension = lambda name, files: Extension(
     'thor.' + name,
-    sources=files,
-    include_dirs=['include/Includes', 'include', '/usr/include'],
+    sources=['src/thor/' + name + '/' + filename for filename in files],
+    include_dirs=['/home/sonkun/Workspace/python-sfml/include/Includes', 'include/Includes', 'include', 'src/thor/' + name],
     language='c++',
-    extra_compile_args = ['-std=c++11', '-fpermissive'],
+    extra_compile_args = ['-std=c++11'],
     libraries=['sfml-system', 'sfml-window', 'sfml-graphics', 'sfml-audio', 'sfml-network', 'thor'])
 
-math = extension(
-	'math',
-	['src/thor/math.pyx', 'src/thor/TrigonometricTraits.cpp'])
 
-vectors = extension(
-	'vectors',
-	['src/thor/vectors.pyx'])
+modules = ['math', 'vectors', 'input', 'time', 'resources', 'graphics', 'shapes', 'animations', 'shapes']
 
-_input = extension(
-	'input',
-	['src/thor/input.pyx'])
+math = extension('math', ['math.pyx', 'Vertex.cpp', 'Triangulation.cpp', 'Rule.cpp', 'Distribution.cpp'])
+vectors = extension('vectors', ['vectors.pyx', 'PolarVector2.cpp'])
+vectors.extra_link_args.append('/usr/local/lib/python3.4/dist-packages/sfml/system.cpython-34m.so')
+vectors.extra_link_args.append('-Wl,-rpath,'+'/usr/local/lib/python3.4/dist-packages/sfml/')
 
-graphics = extension(
-	'graphics',
-	['src/thor/graphics.pyx'])
+input_ = extension('input', ['input.pyx', 'Input.cpp'])
+time = extension('time', ['time.pyx', 'Listener.cpp', 'DerivableTimer.cpp'])
 
-shapes = extension(
-	'shapes',
-	['src/thor/shapes.pyx'])
+resources = extension('resources', ['resources.pyx', 'Resource.cpp'])
 
-time = extension(
-	'time',
-	['src/thor/time.pyx', 'src/thor/TimerFunctor.cpp'])
+graphics = extension('graphics', ['graphics.pyx'])
+shapes = extension('shapes', ['shapes.pyx'])
 
-#extensions = [_input, time]
-extensions = [math, vectors]
+animations = extension('animations', ['animations.pyx', 'Object.cpp', 'AnimationFunction.cpp'])
+particles = extension('particles', ['particles.pyx'])
 
-## Install C headers
-#if platform.system() == 'Windows':
-    ## On Windows: C:\Python27\include\pythor\*_api.h
-    #c_headers = [(sys.exec_prefix +'\\include\\pythor', glob('include/pythor/*.h'))]
-#else:
-    ## On Unix: /usr/local/include/pythor/*_api.h
-    #c_headers = [(sys.exec_prefix + '/include/pythor', glob('include/pythor/*.h'))]
-
-#files = c_headers
+#extensions = [math, vectors, input_, time, resources, graphics, shapes, animations, shapes]
+extensions = [math, vectors, time, graphics, shapes]
 
 with open('README.rst', 'r') as f:
     long_description = f.read()
@@ -118,7 +103,7 @@ kwargs = dict(
             ext_modules=extensions,
             package_dir={'': 'src'},
             packages=['thor'],
-            version='1.0.0',
+            version='2.0.0',
             description='Python bindings for Thor',
             long_description=long_description,
             author='Jonathan de Wachter',

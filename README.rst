@@ -3,8 +3,6 @@ About
 This is version 1.0 of the binding for `Thor <http://www.bromeon.ch/libraries/thor/index.html>`_ 
 released under the `zlib/libpng <http://opensource.org/licenses/Zlib>`_ license.
 
-Python bindings really are the perfect way to sketch software using SFML.
-
 By combining the strength of SFML and its extensions with the ease of the 
 Python language, we can provide an amazing tool to quickly build multimedia 
 software.
